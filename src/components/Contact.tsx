@@ -29,13 +29,13 @@ export default function Contact() {
 
       <div className="mx-auto flex min-h-[75vh] max-w-7xl flex-col justify-between gap-16">
         <div ref={titleRef}>
-          <div className="mb-5 text-xs font-bold uppercase tracking-[0.32em] text-[#F44A22]">CONTACT / PROCHAINE ÉTAPE</div>
+          <div className="mb-5 text-xs font-bold uppercase tracking-[0.32em] text-[#F44A22]">CONTACT / VOTRE PROJET</div>
           <h1 className="max-w-5xl font-oswald text-[13vw] font-black uppercase leading-[0.78] tracking-tighter md:text-[10vw]">
-            CONSTRUISONS
-            <span className="block text-stroke-orange">QUELQUE CHOSE</span>
+            PARLEZ-MOI
+            <span className="block text-stroke-orange">DU PROBLÈME.</span>
           </h1>
           <p className="mt-8 max-w-2xl font-jakarta text-sm leading-7 text-[#161616]/65 md:text-base">
-            Cette version conserve volontairement les coordonnées non confirmées en attente. Les canaux de contact définitifs seront connectés dès qu’ils seront validés.
+            Vous n’avez pas besoin d’avoir déjà défini la solution. Dites-moi simplement ce que vous cherchez à faire, ce qui bloque et où vous voulez arriver.
           </p>
         </div>
 
