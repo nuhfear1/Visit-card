@@ -3,7 +3,6 @@
 import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import Image from "next/image";
 import Link from "next/link";
 
 const services = [
@@ -68,13 +67,12 @@ export default function About() {
             FAIRE CROÎTRE.
           </h1>
           <div className="relative mt-8 aspect-[4/5] w-full max-w-[390px] justify-self-center overflow-hidden lg:col-start-2 lg:row-start-2 lg:row-span-2 lg:mt-0 lg:justify-self-end">
-            <Image
-              src="/Visit-card/gary-services.webp"
+            <img
+              src="/Visit-card/gary-services.webp?v=2"
               alt="Gary dans un décor tropical"
-              fill
-              priority
-              sizes="(min-width: 1280px) 390px, (min-width: 1024px) 30vw, (min-width: 768px) 390px, calc(100vw - 3rem)"
-              className="object-cover object-center"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+              loading="eager"
+              decoding="async"
             />
           </div>
           <p className="mt-8 max-w-3xl text-sm leading-7 text-[#161616]/65 md:text-base lg:col-start-1 lg:row-start-3">
