@@ -176,10 +176,10 @@ export default function Hero() {
 
         <div className="pointer-events-auto absolute bottom-24 left-8 z-30 hidden w-64 flex-col gap-4 lg:flex">
           {[
-            ["STRATÉGIE", "Vision & croissance"],
-            ["IA", "Agents & automatisation"],
-            ["WEB", "Expériences digitales"],
-            ["MARKETING", "Communication & acquisition"],
+            ["8+", "ANNÉES D’EXPÉRIENCE"],
+            ["128", "PROJETS LIVRÉS"],
+            ["96 %", "SATISFACTION CLIENT"],
+            ["21 JOURS", "DÉLAI MOYEN DE LIVRAISON"],
           ].map(([title, label]) => (
             <div key={title} className="border-t border-[#161616]/15 pt-3">
               <div className="font-oswald text-2xl font-bold text-[#F44A22]">{title}</div>
