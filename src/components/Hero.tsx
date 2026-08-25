@@ -168,7 +168,11 @@ export default function Hero() {
           </div>
         </div>
 
-        <img src="/Visit-card/gary-hero.webp" alt="Gary WILFRED-BORILLA" className="absolute bottom-12 left-1/2 z-20 h-[72%] max-w-[540px] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)]" />
+        <img
+          src="/Visit-card/gary-hero.webp"
+          alt="Gary WILFRED-BORILLA"
+          className="absolute bottom-10 left-1/2 z-20 h-[66vh] w-auto max-w-[90vw] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)] sm:bottom-11 sm:h-[70vh] sm:max-w-[72vw] md:bottom-12 md:h-[74vh] md:max-w-[58vw] lg:h-[78vh] lg:max-w-[44vw] xl:h-[80vh] xl:max-h-[860px] xl:max-w-[38vw]"
+        />
 
         <div className="pointer-events-auto absolute bottom-24 left-8 z-30 hidden w-64 flex-col gap-4 lg:flex">
           {[
