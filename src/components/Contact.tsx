@@ -3,12 +3,12 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ArrowUpRight, Mail, Linkedin, Github } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
 
 const links = [
-  { label: "EMAIL", value: "À CONFIGURER", icon: Mail },
-  { label: "LINKEDIN", value: "À CONFIGURER", icon: Linkedin },
-  { label: "GITHUB", value: "nuhfear1", icon: Github, href: "https://github.com/nuhfear1" },
+  { label: "EMAIL", value: "À CONFIGURER", mark: "@", icon: Mail },
+  { label: "LINKEDIN", value: "À CONFIGURER", mark: "in" },
+  { label: "GITHUB", value: "nuhfear1", mark: "GH", href: "https://github.com/nuhfear1" },
 ];
 
 export default function Contact() {
@@ -40,11 +40,17 @@ export default function Contact() {
         </div>
 
         <div ref={cardsRef} className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {links.map(({ label, value, icon: Icon, href }) => {
+          {links.map(({ label, value, mark, icon: Icon, href }) => {
             const body = (
               <>
                 <div className="flex items-start justify-between">
-                  <Icon className="h-5 w-5 text-[#F44A22]" />
+                  {Icon ? (
+                    <Icon className="h-5 w-5 text-[#F44A22]" />
+                  ) : (
+                    <span className="flex h-6 min-w-6 items-center justify-center rounded-md border border-[#F44A22]/40 px-1 text-[10px] font-black uppercase tracking-tight text-[#F44A22]">
+                      {mark}
+                    </span>
+                  )}
                   <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </div>
                 <div>
