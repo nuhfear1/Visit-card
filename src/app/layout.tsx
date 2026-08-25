@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Gary WILFRED-BORILLA",
-  description: "Personal brand experience — services, expertise and projects by Gary WILFRED-BORILLA.",
+  description: "Gary WILFRED-BORILLA — stratégie & croissance, agents IA & automatisation, web & expériences digitales, marketing digital & communication.",
 };
 
 import Navbar from "@/components/Navbar";
