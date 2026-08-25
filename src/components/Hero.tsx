@@ -168,7 +168,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <img src="/profile-placeholder.svg" alt="Gary WILFRED-BORILLA" className="absolute bottom-12 left-1/2 h-[72%] max-w-[540px] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)]" />
+        <img src="/Visit-card/profile-placeholder.svg" alt="Gary WILFRED-BORILLA" className="absolute bottom-12 left-1/2 h-[72%] max-w-[540px] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)]" />
 
         <div className="pointer-events-auto absolute bottom-24 left-8 hidden w-64 flex-col gap-4 lg:flex">
           {[
