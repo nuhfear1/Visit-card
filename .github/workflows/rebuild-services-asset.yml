@@ -1,0 +1,45 @@
+name: Rebuild services portrait
+
+on:
+  push:
+    branches: [asset-services-upload]
+    paths:
+      - 'public/.gary-services.parts/**'
+      - '.github/workflows/rebuild-services-asset.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: asset-services-upload
+
+      - name: Rebuild and verify WebP
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat public/.gary-services.parts/*.txt > /tmp/gary-services.b64
+          test "$(wc -c < /tmp/gary-services.b64 | tr -d ' ')" = "68560"
+          base64 -d /tmp/gary-services.b64 > public/gary-services.webp
+          test "$(wc -c < public/gary-services.webp | tr -d ' ')" = "51418"
+          echo "58c70a8ff3c19ffcf0420a2677ecb95615880b5509791de6842c8b02f5693a48  public/gary-services.webp" | sha256sum -c -
+          file public/gary-services.webp
+
+      - name: Commit reconstructed asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/gary-services.webp
+          if git diff --cached --quiet; then
+            echo "Asset already up to date"
+          else
+            git commit -m "chore: reconstruire le portrait services"
+            git push origin HEAD:asset-services-upload
+          fi
