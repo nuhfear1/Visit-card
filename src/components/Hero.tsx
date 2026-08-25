@@ -142,11 +142,9 @@ export default function Hero() {
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
 
       <div className="absolute top-6 left-8 right-8 z-40 flex items-start justify-between">
-        <div ref={logoRef} className="flex items-center gap-3 text-[#F44A22]">
-          <svg className="h-9 w-9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 0L15.3 8.7L24 12L15.3 15.3L12 24L8.7 15.3L0 12L8.7 8.7Z" />
-          </svg>
-          <span className="font-oswald text-xl md:text-2xl tracking-[0.2em]">GWB</span>
+        <div ref={logoRef} className="flex items-center gap-3">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#F44A22] shadow-[0_0_0_4px_rgba(244,74,34,.12)]" aria-hidden="true" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#161616]/70 md:text-[11px]">DISPONIBLE POUR DE NOUVEAUX PROJETS</span>
         </div>
 
         <div className="hidden lg:flex max-w-[320px] flex-col items-end gap-3 text-right">
