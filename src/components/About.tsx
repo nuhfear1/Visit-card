@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import Image from "next/image";
 import Link from "next/link";
 
 const services = [
@@ -56,14 +57,27 @@ export default function About() {
       </div>
 
       <div className="max-w-7xl w-full mx-auto mt-10 flex flex-col">
-        <div ref={titleRef} className="w-full mb-12 md:mb-16">
-          <div className="text-xs font-bold uppercase tracking-[0.3em] text-[#F44A22] mb-5">Une approche globale, quatre pôles</div>
-          <h1 className="font-oswald font-black text-[11vw] md:text-[8vw] uppercase leading-[0.82] tracking-tighter">
+        <div
+          ref={titleRef}
+          className="mb-12 grid w-full grid-cols-1 md:mb-16 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] lg:gap-x-10 xl:gap-x-14"
+        >
+          <div className="mb-5 text-xs font-bold uppercase tracking-[0.3em] text-[#F44A22] lg:col-start-1 lg:row-start-1">Une approche globale, quatre pôles</div>
+          <h1 className="font-oswald font-black text-[11vw] md:text-[8vw] uppercase leading-[0.82] tracking-tighter lg:col-start-1 lg:row-start-2">
             CONCEVOIR.
             <span className="block text-stroke-orange">CONNECTER.</span>
             FAIRE CROÎTRE.
           </h1>
-          <p className="mt-8 max-w-3xl text-sm md:text-base leading-7 text-[#161616]/65">
+          <div className="relative mt-8 aspect-[4/5] w-full max-w-[390px] justify-self-center overflow-hidden lg:col-start-2 lg:row-start-2 lg:row-span-2 lg:mt-0 lg:justify-self-end">
+            <Image
+              src="/Visit-card/gary-services.webp"
+              alt="Gary dans un décor tropical"
+              fill
+              priority
+              sizes="(min-width: 1280px) 390px, (min-width: 1024px) 30vw, (min-width: 768px) 390px, calc(100vw - 3rem)"
+              className="object-cover object-center"
+            />
+          </div>
+          <p className="mt-8 max-w-3xl text-sm leading-7 text-[#161616]/65 md:text-base lg:col-start-1 lg:row-start-3">
             Je ne présente pas une collection de compétences séparées. Je construis des systèmes digitaux cohérents où stratégie, intelligence artificielle, web et marketing travaillent ensemble autour d’un même objectif business.
           </p>
         </div>
