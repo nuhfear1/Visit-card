@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Gary WILFRED-BORILLA placeholder portrait</title>
+  <desc id="desc">Temporary graphic placeholder with the initials GWB.</desc>
+  <rect width="800" height="1000" fill="#E4E2E3"/>
+  <circle cx="400" cy="430" r="250" fill="#F44A22" opacity="0.12"/>
+  <text x="400" y="485" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="180" font-weight="700" fill="#161616">GWB</text>
+  <text x="400" y="690" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" letter-spacing="8" fill="#161616">PORTRAIT / TBD</text>
+</svg>
