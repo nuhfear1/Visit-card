@@ -24,7 +24,7 @@ const services = [
   {
     num: "04",
     title: "MARKETING DIGITAL & COMMUNICATION",
-    text: "Faire arriver le bon message jusqu’aux bonnes personnes : acquisition, SEO, contenu, campagnes, copywriting et emailing réunis autour d’un même objectif.",
+    text: "Faire arriver le bon message jusqu’aux bonnes personnes : SEA, Social Ads, campagnes, copywriting, emailing et contenu pilotés autour d’un objectif clair de visibilité, d’acquisition et de conversion.",
   },
 ];
 
