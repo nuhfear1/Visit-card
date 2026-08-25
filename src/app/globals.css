@@ -84,7 +84,7 @@ body {
 }
 
 html, body, .cursor-default {
-  cursor: url('/cursor.svg') 3 3, auto;
+  cursor: url('/Visit-card/cursor.svg') 3 3, auto;
 }
 
 a,
@@ -97,5 +97,5 @@ label,
 select,
 option,
 .cursor-pointer {
-  cursor: url('/cursor-pointer.svg') 3 3, pointer;
+  cursor: url('/Visit-card/cursor-pointer.svg') 3 3, pointer;
 }
