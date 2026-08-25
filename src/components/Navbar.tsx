@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Home, User, Briefcase, Mail } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Home, User, Briefcase, Mail, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
@@ -55,6 +55,7 @@ const GlassFilter: React.FC = () => (
 export default function Navbar() {
   const pathname = usePathname();
   const { startTransition } = usePageTransition();
+  const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
     { icon: <Home size={18} />, label: "Accueil", href: "/" },
@@ -63,10 +64,39 @@ export default function Navbar() {
     { icon: <Mail size={18} />, label: "Contact", href: "/contact" },
   ];
 
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isOpen]);
+
+  const navigate = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    setIsOpen(false);
+    if (pathname !== href) startTransition(href);
+  };
+
   return (
     <>
       <GlassFilter />
-      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+
+      <div className="fixed top-6 left-1/2 z-50 hidden -translate-x-1/2 md:block">
         <GlassEffect className="rounded-full p-1.5 hover:p-2 hover:rounded-full transition-all duration-500">
           <div className="flex items-center justify-center gap-2 rounded-full p-1 overflow-hidden">
             {navItems.map((item, index) => {
@@ -75,10 +105,7 @@ export default function Navbar() {
                 <Link
                   key={index}
                   href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (pathname !== item.href) startTransition(item.href);
-                  }}
+                  onClick={(event) => navigate(event, item.href)}
                   className={`flex items-center px-4 py-2 rounded-full transition-all duration-500 hover:scale-105 cursor-pointer group ${isActive ? "bg-[#F44A22] text-white" : "bg-white/10 text-palette-stone hover:bg-[#F44A22] hover:text-white"}`}
                   style={{ transformOrigin: "center center", transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}
                 >
@@ -89,6 +116,57 @@ export default function Navbar() {
             })}
           </div>
         </GlassEffect>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
+        aria-expanded={isOpen}
+        aria-controls="mobile-navigation"
+        className={`fixed right-5 top-5 z-[80] flex h-12 w-12 items-center justify-center rounded-full border border-[#161616]/20 backdrop-blur-xl transition-all duration-300 md:hidden ${isOpen ? "bg-[#161616] text-white" : "bg-white/70 text-[#161616] shadow-[0_8px_30px_rgba(0,0,0,.12)]"}`}
+      >
+        {isOpen ? <X size={21} /> : <Menu size={21} />}
+      </button>
+
+      <div
+        id="mobile-navigation"
+        aria-hidden={!isOpen}
+        className={`fixed inset-0 z-[70] overflow-hidden bg-[#E4E2E3]/95 backdrop-blur-2xl transition-all duration-500 md:hidden ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+      >
+        <div className="pointer-events-none absolute -left-24 top-28 h-72 w-72 rounded-full bg-[#F44A22]/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-[#7B2CBF]/10 blur-3xl" />
+
+        <div className="relative flex h-full flex-col px-6 pb-8 pt-24">
+          <div className="mb-10 text-[10px] font-bold uppercase tracking-[0.3em] text-[#161616]/45">Navigation</div>
+
+          <nav className="flex flex-1 flex-col justify-center" aria-label="Navigation mobile">
+            {navItems.map((item, index) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={(event) => navigate(event, item.href)}
+                  tabIndex={isOpen ? 0 : -1}
+                  className={`group flex items-center justify-between border-t border-[#161616]/15 py-5 transition-all duration-300 ${isActive ? "text-[#F44A22]" : "text-[#161616]"}`}
+                >
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-[10px] font-bold tracking-[0.2em] text-[#161616]/35">0{index + 1}</span>
+                    <span className="font-oswald text-[12vw] font-black uppercase leading-none tracking-tight">{item.label}</span>
+                  </div>
+                  <span className={`text-2xl transition-transform duration-300 group-active:translate-x-1 ${isActive ? "rotate-45" : ""}`}>↗</span>
+                </Link>
+              );
+            })}
+            <div className="border-t border-[#161616]/15" />
+          </nav>
+
+          <div className="flex items-center gap-2 pt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-[#161616]/50">
+            <span className="h-2 w-2 rounded-full bg-[#F44A22]" />
+            Disponible pour de nouveaux projets
+          </div>
+        </div>
       </div>
     </>
   );
