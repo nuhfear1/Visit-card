@@ -161,16 +161,16 @@ export default function Hero() {
       </div>
 
       <div ref={contentRef} className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-        <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-8 select-none">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center -translate-y-8 select-none">
           <div className="font-oswald text-[9vw] font-black uppercase leading-[0.8] tracking-tighter text-[#161616]/10">JE CONÇOIS</div>
           <div className="mt-4 min-h-[1.2em] px-5 text-center font-oswald text-[7vw] md:text-[8vw] font-black uppercase leading-[0.9] tracking-tighter text-stroke-orange">
             {displayText}<span className="animate-pulse">|</span>
           </div>
         </div>
 
-        <img src="/Visit-card/gary-hero.webp" alt="Gary WILFRED-BORILLA" className="absolute bottom-0 left-1/2 h-[78%] md:h-[82%] max-w-[560px] -translate-x-1/2 object-contain object-bottom drop-shadow-[0_22px_42px_rgba(0,0,0,.18)]" />
+        <img src="/Visit-card/gary-hero.webp" alt="Gary WILFRED-BORILLA" className="absolute bottom-12 left-1/2 z-20 h-[72%] max-w-[540px] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)]" />
 
-        <div className="pointer-events-auto absolute bottom-24 left-8 hidden w-64 flex-col gap-4 lg:flex">
+        <div className="pointer-events-auto absolute bottom-24 left-8 z-30 hidden w-64 flex-col gap-4 lg:flex">
           {[
             ["STRATÉGIE", "Vision & croissance"],
             ["IA", "Agents & automatisation"],
