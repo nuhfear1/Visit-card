@@ -152,10 +152,10 @@ export default function Hero() {
         <div className="hidden lg:flex max-w-[320px] flex-col items-end gap-3 text-right">
           <div className="font-cormorant text-3xl italic">Gary WILFRED-BORILLA</div>
           <p className="text-xs leading-relaxed text-[#161616]/75">
-            Je conçois des systèmes digitaux qui relient stratégie, intelligence artificielle, expériences web et marketing.
+            J’interviens en stratégie, intelligence artificielle, web et marketing pour résoudre des problèmes concrets et faire avancer les projets.
           </p>
           <button onClick={() => startTransition("/contact")} className="rounded-full border border-[#161616]/30 px-4 py-2 text-[10px] font-bold tracking-[0.18em] transition hover:border-[#F44A22] hover:text-[#F44A22]">
-            ME CONTACTER ↗
+            PARLONS DE VOTRE PROJET ↗
           </button>
         </div>
       </div>
