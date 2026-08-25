@@ -13,11 +13,10 @@ export default function Hero() {
   const { startTransition } = usePageTransition();
 
   const phrases = useMemo(() => [
-    "DIGITAL STRATEGY",
-    "GROWTH & ACQUISITION",
-    "SEO / SEA / SOCIAL ADS",
-    "COPYWRITING & CONVERSION",
-    "WEB EXPERIENCES",
+    "STRATÉGIE & CROISSANCE",
+    "AGENTS IA & AUTOMATISATION",
+    "WEB & EXPÉRIENCES DIGITALES",
+    "MARKETING DIGITAL & COMMUNICATION",
   ], []);
 
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -150,20 +149,20 @@ export default function Hero() {
           <span className="font-oswald text-xl md:text-2xl tracking-[0.2em]">GWB</span>
         </div>
 
-        <div className="hidden lg:flex max-w-[300px] flex-col items-end gap-3 text-right">
+        <div className="hidden lg:flex max-w-[320px] flex-col items-end gap-3 text-right">
           <div className="font-cormorant text-3xl italic">Gary WILFRED-BORILLA</div>
           <p className="text-xs leading-relaxed text-[#161616]/75">
-            Digital strategy, acquisition, content and web execution built as one coherent growth system.
+            Je conçois des systèmes digitaux qui relient stratégie, intelligence artificielle, expériences web et marketing.
           </p>
           <button onClick={() => startTransition("/contact")} className="rounded-full border border-[#161616]/30 px-4 py-2 text-[10px] font-bold tracking-[0.18em] transition hover:border-[#F44A22] hover:text-[#F44A22]">
-            GET IN TOUCH ↗
+            ME CONTACTER ↗
           </button>
         </div>
       </div>
 
       <div ref={contentRef} className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-8 select-none">
-          <div className="font-oswald text-[9vw] font-black uppercase leading-[0.8] tracking-tighter text-[#161616]/10">I BUILD FOR</div>
+          <div className="font-oswald text-[9vw] font-black uppercase leading-[0.8] tracking-tighter text-[#161616]/10">JE CONÇOIS</div>
           <div className="mt-4 min-h-[1.2em] px-5 text-center font-oswald text-[7vw] md:text-[8vw] font-black uppercase leading-[0.9] tracking-tighter text-stroke-orange">
             {displayText}<span className="animate-pulse">|</span>
           </div>
@@ -171,14 +170,15 @@ export default function Hero() {
 
         <img src="/profile-placeholder.svg" alt="Gary WILFRED-BORILLA" className="absolute bottom-12 left-1/2 h-[72%] max-w-[540px] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)]" />
 
-        <div className="pointer-events-auto absolute bottom-24 left-8 hidden w-56 flex-col gap-4 lg:flex">
+        <div className="pointer-events-auto absolute bottom-24 left-8 hidden w-64 flex-col gap-4 lg:flex">
           {[
-            ["SEO", "Organic visibility"],
-            ["SEA", "Paid acquisition"],
-            ["SOCIAL", "Content & ads"],
+            ["STRATÉGIE", "Vision & croissance"],
+            ["IA", "Agents & automatisation"],
+            ["WEB", "Expériences digitales"],
+            ["MARKETING", "Communication & acquisition"],
           ].map(([title, label]) => (
             <div key={title} className="border-t border-[#161616]/15 pt-3">
-              <div className="font-oswald text-3xl font-bold text-[#F44A22]">{title}</div>
+              <div className="font-oswald text-2xl font-bold text-[#F44A22]">{title}</div>
               <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#161616]/55">{label}</div>
             </div>
           ))}
@@ -189,7 +189,7 @@ export default function Hero() {
         <div className="animate-marquee flex w-max items-center gap-12 whitespace-nowrap font-oswald text-base font-extrabold uppercase tracking-widest text-[#FEF8E8] md:text-lg">
           {Array.from({ length: 4 }).map((_, index) => (
             <span key={index} className="flex items-center gap-12">
-              <span>DIGITAL STRATEGY</span><span>✦</span><span>GROWTH & ACQUISITION</span><span>✦</span><span>SEO / SEA</span><span>✦</span><span>SOCIAL ADS</span><span>✦</span><span>COPYWRITING</span><span>✦</span>
+              <span>STRATÉGIE & CROISSANCE</span><span>✦</span><span>AGENTS IA & AUTOMATISATION</span><span>✦</span><span>WEB & EXPÉRIENCES DIGITALES</span><span>✦</span><span>MARKETING DIGITAL & COMMUNICATION</span><span>✦</span>
             </span>
           ))}
         </div>
