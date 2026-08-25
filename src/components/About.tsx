@@ -9,22 +9,22 @@ const services = [
   {
     num: "01",
     title: "STRATÉGIE & CROISSANCE",
-    text: "Audit, positionnement, stratégie digitale, acquisition, parcours de conversion et feuille de route de croissance. L’objectif : donner une direction claire avant d’activer les leviers.",
+    text: "Clarifier la direction, identifier les bons leviers et transformer les objectifs en décisions concrètes : audit, positionnement, acquisition, conversion et feuille de route.",
   },
   {
     num: "02",
     title: "AGENTS IA & AUTOMATISATION",
-    text: "Conception d’agents IA, assistants métier, automatisation de workflows et intégrations avec les outils de l’entreprise pour accélérer les opérations et simplifier les tâches répétitives.",
+    text: "Transformer les tâches répétitives et les processus lourds en systèmes capables d’agir : agents IA, assistants métier, automatisations et intégrations.",
   },
   {
     num: "03",
     title: "WEB & EXPÉRIENCES DIGITALES",
-    text: "Sites vitrines, landing pages, interfaces interactives, parcours digitaux et expériences web pensées pour être utiles, mémorables et orientées conversion.",
+    text: "Concevoir des expériences qui ne se contentent pas d’exister : elles doivent faire comprendre, orienter et déclencher une action.",
   },
   {
     num: "04",
     title: "MARKETING DIGITAL & COMMUNICATION",
-    text: "SEO, acquisition payante, réseaux sociaux, contenu, copywriting, emailing, campagnes et mesure de performance réunis dans une logique cohérente plutôt qu’en services isolés.",
+    text: "Faire arriver le bon message jusqu’aux bonnes personnes : acquisition, SEO, contenu, campagnes, copywriting et emailing réunis autour d’un même objectif.",
   },
 ];
 
@@ -60,7 +60,7 @@ export default function About() {
           ref={titleRef}
           className="mb-12 grid w-full grid-cols-1 md:mb-16 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] lg:gap-x-10 xl:gap-x-14"
         >
-          <div className="mb-5 text-xs font-bold uppercase tracking-[0.3em] text-[#F44A22] lg:col-start-1 lg:row-start-1">Une approche globale, quatre pôles</div>
+          <div className="mb-5 text-xs font-bold uppercase tracking-[0.3em] text-[#F44A22] lg:col-start-1 lg:row-start-1">Quatre leviers. Selon le problème.</div>
           <h1 className="font-oswald font-black text-[11vw] md:text-[8vw] uppercase leading-[0.82] tracking-tighter lg:col-start-1 lg:row-start-2">
             CONCEVOIR.
             <span className="block text-stroke-orange">CONNECTER.</span>
@@ -76,7 +76,7 @@ export default function About() {
             />
           </div>
           <p className="mt-8 max-w-3xl text-sm leading-7 text-[#161616]/65 md:text-base lg:col-start-1 lg:row-start-3">
-            Je ne présente pas une collection de compétences séparées. Je construis des systèmes digitaux cohérents où stratégie, intelligence artificielle, web et marketing travaillent ensemble autour d’un même objectif business.
+            Un projet peut demander un levier précis ou plusieurs à la fois. Mon rôle est d’identifier ce qui compte vraiment, d’intervenir là où c’est nécessaire et de faire avancer le projet avec une direction claire.
           </p>
         </div>
 
@@ -104,7 +104,7 @@ export default function About() {
 
         <div className="mt-6 rounded-[2.2rem] border-3 border-[#161616] bg-[#7B2CBF] p-8 md:p-10 text-white flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <div className="max-w-3xl">
-            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/65 mb-4">Un seul système, plusieurs leviers</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/65 mb-4">Un seul levier ou plusieurs. Selon ce qu’il faut résoudre.</div>
             <h3 className="font-oswald text-3xl md:text-5xl font-black uppercase leading-none">Le bon levier dépend du problème à résoudre.</h3>
           </div>
           <Link href="/contact" className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[#161616] transition-transform hover:scale-105">
