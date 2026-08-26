@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, Mail, Phone, MessageCircle, type LucideIcon } from "lucide-react";
 import { getCopy, type Locale } from "@/lib/i18n";
+import useReducedMotion from "@/hooks/useReducedMotion";
 
 type ContactLink = {
   label: string;
@@ -20,6 +21,7 @@ export default function Contact({ locale = "fr" }: { locale?: Locale }) {
   const cardsRef = useRef<HTMLDivElement>(null);
   const copy = getCopy(locale).contactPage;
   const isRtl = locale === "ar";
+  const reducedMotion = useReducedMotion();
 
   const links: ContactLink[] = [
     { label: copy.email, value: "garywilfredborilla@gmail.com", mark: "@", icon: Mail, href: "mailto:garywilfredborilla@gmail.com" },
@@ -28,10 +30,11 @@ export default function Contact({ locale = "fr" }: { locale?: Locale }) {
   ];
 
   useGSAP(() => {
+    if (reducedMotion) return;
     const tl = gsap.timeline({ delay: 0.15 });
     tl.from(titleRef.current, { y: 35, opacity: 0, duration: 0.9, ease: "power3.out" })
       .from(cardsRef.current, { y: 24, opacity: 0, duration: 0.7, ease: "power3.out", clearProps: "transform,opacity" }, "-=0.45");
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [reducedMotion] });
 
   return (
     <section ref={containerRef} dir={isRtl ? "rtl" : "ltr"} className="relative min-h-screen overflow-hidden bg-[#E4E2E3] px-6 pb-20 pt-28 text-[#161616] md:px-12 lg:px-20">
