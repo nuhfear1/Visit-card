@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
 import { getCopy, localizedPath, type Locale } from "@/lib/i18n";
+import useReducedMotion from "@/hooks/useReducedMotion";
 
 export default function About({ locale = "fr" }: { locale?: Locale }) {
   const containerRef = useRef<HTMLElement>(null);
@@ -13,13 +14,15 @@ export default function About({ locale = "fr" }: { locale?: Locale }) {
   const cardsRef = useRef<HTMLDivElement>(null);
   const copy = getCopy(locale).servicesPage;
   const isRtl = locale === "ar";
+  const reducedMotion = useReducedMotion();
 
   useGSAP(() => {
+    if (reducedMotion) return;
     const tl = gsap.timeline({ delay: 0.2 });
     tl.from(logoRef.current, { y: -20, opacity: 0, duration: 0.8, ease: "power3.out" })
       .from(titleRef.current, { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.4")
       .from(cardsRef.current?.children || [], { y: 28, opacity: 0, duration: 0.75, stagger: 0.1, ease: "power3.out" }, "-=0.45");
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [reducedMotion] });
 
   return (
     <section id="about" ref={containerRef} dir={isRtl ? "rtl" : "ltr"} className="relative w-full min-h-screen bg-white text-[#161616] py-24 px-6 md:px-12 lg:px-20 flex flex-col items-center justify-center z-20 overflow-hidden font-jakarta">
