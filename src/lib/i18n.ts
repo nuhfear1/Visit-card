@@ -1,12 +1,13 @@
-export type Locale = "fr" | "en" | "es" | "ar" | "ja" | "zh" | "ko";
+export type Locale = "fr" | "en" | "es" | "pt" | "ar" | "ja" | "zh" | "ko";
 
-export const localizedLocales: Locale[] = ["en", "es", "ar", "ja", "zh", "ko"];
+export const localizedLocales: Locale[] = ["en", "es", "pt", "ar", "ja", "zh", "ko"];
 export const allLocales: Locale[] = ["fr", ...localizedLocales];
 
 export const localeOptions: { code: Locale; label: string }[] = [
   { code: "fr", label: "Français" },
   { code: "en", label: "English" },
   { code: "es", label: "Español (Latam)" },
+  { code: "pt", label: "Português" },
   { code: "ar", label: "العربية" },
   { code: "ja", label: "日本語" },
   { code: "zh", label: "中文" },
@@ -213,6 +214,42 @@ const es: SiteCopy = {
   contactPage: { eyebrow: "CONTACTO / TU PROYECTO", headline: ["CUÉNTAME", "QUÉ ESTÁ FRENANDO."], intro: "No necesitas llegar con la solución definida. Cuéntame qué quieres lograr, qué está bloqueando el avance y adónde necesitas llegar.", email: "EMAIL", phone: "TELÉFONO", whatsapp: "WHATSAPP" },
 };
 
+const pt: SiteCopy = {
+  nav: { home: "Início", services: "Serviços", projects: "Projetos", contact: "Falar sobre o projeto", homeDesc: "Começar pelo problema", servicesDesc: "Escolher a alavanca certa", projectsDesc: "Ver as provas", contactDesc: "Me contar o que está travando", mobileEyebrow: "EM QUE PONTO VOCÊ ESTÁ?", mobileIntro: "Entender. Escolher. Validar. Depois, falar do projeto.", available: "Disponível para novos projetos", language: "Idioma" },
+  hero: {
+    available: "DISPONÍVEL PARA NOVOS PROJETOS",
+    intro: "Você não precisa chegar com a solução pronta. Me conte o que está travando o projeto e onde quer chegar. Eu identifico a alavanca que realmente faz sentido — estratégia, IA, web ou aquisição.",
+    cta: "ME CONTE O QUE ESTÁ TRAVANDO ↗", lead: "PRIMEIRO, O PROBLEMA.",
+    phrases: ["A AQUISIÇÃO PAROU DE CRESCER", "TRABALHO MANUAL DEMAIS", "UM SITE QUE NÃO CONVERTE", "FERRAMENTAS DESCONECTADAS"],
+    stats: [["8+", "ANOS DE EXPERIÊNCIA"], ["150+", "PROJETOS & MISSÕES"], ["96%", "SATISFAÇÃO DOS CLIENTES"], ["21 DIAS", "PRAZO MÉDIO DE ENTREGA"]],
+    marquee: ["ESTRATÉGIA QUANDO FALTA DIREÇÃO", "IA QUANDO O MANUAL CONSOME TEMPO DEMAIS", "WEB QUANDO A EXPERIÊNCIA ATRAPALHA", "AQUISIÇÃO QUANDO O CRESCIMENTO ESTAGNA"],
+  },
+  servicesPage: {
+    pageLabel: "SERVIÇOS", eyebrow: "Antes de escolher um serviço, é preciso entender o que realmente está travando o projeto.", headline: ["VER COM CLAREZA.", "ESCOLHER CERTO.", "AGIR."],
+    intro: "Um projeto não precisa de tudo. Às vezes, uma única alavanca resolve. Em outros casos, várias precisam trabalhar juntas. O ponto de partida é sempre o mesmo: encontrar o gargalo real antes de decidir o que ativar.", activateWhen: "ATIVAR QUANDO", outcomeLabel: "O QUE ISSO DESTRAVA",
+    services: [
+      { title: "ESTRATÉGIA & CRESCIMENTO", signal: "As ideias se acumulam, as prioridades mudam e fica cada vez mais difícil decidir o que deve vir primeiro.", text: "Eu organizo o problema, o objetivo e as alavancas que realmente podem gerar movimento: posicionamento, aquisição, conversão, prioridades e roadmap.", outcome: "Uma direção clara e decisões que podem ser executadas." },
+      { title: "AGENTES DE IA & AUTOMAÇÃO", signal: "Mensagens, follow-ups, lançamentos de dados ou tarefas repetitivas ainda consomem horas humanas toda semana.", text: "Transformo esses fluxos em sistemas capazes de agir: agentes de IA, assistentes de negócio, automações e integrações com as ferramentas que você já usa.", outcome: "Menos trabalho manual, menos esquecimentos e mais tempo para o que realmente exige julgamento humano." },
+      { title: "WEB & EXPERIÊNCIAS DIGITAIS", signal: "O site existe, mas explica pouco, orienta mal ou deixa gente demais sem saber qual é o próximo passo.", text: "Reestruturo arquitetura, experiência, mensagens e jornadas para deixar a proposta mais fácil de entender e a ação mais natural.", outcome: "Uma experiência mais clara, mais confiável e melhor orientada para conversão." },
+      { title: "MARKETING DIGITAL & COMUNICAÇÃO", signal: "Você investe em visibilidade ou aquisição, mas o crescimento trava, as campanhas perdem precisão ou a mensagem se dilui.", text: "Atuo em SEA, Social Ads, campanhas, copywriting, e-mail e conteúdo de acordo com o resultado que precisa ser movido.", outcome: "Ações mais precisas, indicadores mais úteis e marketing conectado a um objetivo de negócio claro." },
+    ],
+    ctaEyebrow: "VOCÊ NÃO PRECISA ESCOLHER O SERVIÇO.", ctaHeadline: "ME CONTE O QUE ESTÁ TRAVANDO. EU TE DIGO ONDE INTERVIR.", ctaText: "Um problema, um objetivo e um pouco de contexto já são suficientes para começar.", cta: "ME CONTE O QUE ESTÁ TRAVANDO ↗",
+  },
+  projectsPage: {
+    eyebrow: "PROJETOS / PROVAS", headline: "UM PROJETO TRAVADO NÃO PRECISA DE UM CATÁLOGO DE SERVIÇOS. PRECISA DA ALAVANCA CERTA.", intro: "Aquisição, experiência web, dados, automação, IA: seis situações em que o trabalho começou pelo problema — não por uma solução que precisava ser vendida.", situation: "SITUAÇÃO",
+    projects: [
+      { title: "CLÍNICA MÉDICA INTELIGENTE", tags: "WEB · EXPERIÊNCIA DIGITAL · IA", facts: [["DESAFIO", "Pacientes precisam entender rapidamente onde serão atendidos, o que preparar e qual é o próximo passo, sem atrito."], ["MISSÃO", "Criar uma experiência digital clara para duas clínicas de cardiologia."], ["IMPLEMENTAÇÃO", "Arquitetura de informação, jornada do paciente, design web e recursos inteligentes construídos em torno das necessidades reais da clínica."], ["IMPACTO", "Uma presença digital mais clara, mais confiável e mais simples de usar antes mesmo da consulta."], ["PARA QUEM", "Clínica de cardiologia."]] },
+      { title: "CLUBE DE FUTEBOL", tags: "MARKETING · COMUNICAÇÃO · DESENVOLVIMENTO", facts: [["DESAFIO", "Fazer uma marca esportiva crescer em um mercado em expansão sem perder sua identidade."], ["MISSÃO", "Apoiar a visibilidade e a comunicação em torno do crescimento da PSG Academy USA."], ["IMPLEMENTAÇÃO", "Comunicação sobre a rede, a PSG US Development Academy e os Pro Summer Camps."], ["IMPACTO", "Uma presença de marca fortalecida pela expansão da rede nos Estados Unidos e por programas com alcance internacional."], ["PARA QUEM", "PSG Academy USA."]] },
+      { title: "IMOBILIÁRIA", tags: "MARKETING DIGITAL · AQUISIÇÃO · CONTEÚDO", facts: [["DESAFIO", "Visibilidade sozinha não basta quando a atenção digital não vira contatos realmente qualificados."], ["MISSÃO", "Aumentar a visibilidade e a aquisição de uma imobiliária."], ["IMPLEMENTAÇÃO", "Conteúdo, landing pages, estratégia editorial, redes sociais, análise de buscas e tracking."], ["IMPACTO", "Uma estrutura digital pensada para captar melhor a demanda, medir performance e gerar leads qualificados."], ["PARA QUEM", "Egila, imobiliária."]] },
+      { title: "ATACADO & DISTRIBUIÇÃO", tags: "DADOS · AUTOMAÇÃO · SEGMENTAÇÃO", facts: [["DESAFIO", "Uma base de clientes perde valor rápido quando duplicidades, dados faltantes e segmentos pouco claros começam a se acumular."], ["MISSÃO", "Transformar um arquivo de clientes em uma ferramenta comercial realmente utilizável."], ["IMPLEMENTAÇÃO", "Limpeza, classificação, formulário conectado, painel de acompanhamento e segmentação por cidade, perfil ou tipo de cliente."], ["IMPACTO", "Uma base estruturada e pronta para campanhas de WhatsApp ou e-mail mais direcionadas, com menos tempo perdido retrabalhando dados."], ["PARA QUEM", "Promocash."]] },
+      { title: "AGÊNCIA DE MARKETING DIGITAL", tags: "SEA · SOCIAL ADS · PERFORMANCE", facts: [["DESAFIO", "Quando o orçamento cresce, cada decisão precisa aparecer nos números: custo, qualidade do tráfego e rentabilidade."], ["MISSÃO", "Gerenciar e otimizar campanhas de aquisição em um portfólio multilíngue."], ["IMPLEMENTAÇÃO", "SEA, Social Ads, testes A/B, gestão de CPC e orçamento, Quality Score, tracking, análise de buscas e reporting."], ["IMPACTO", "Experiência prática em mais de 100 contas multilíngues, com acompanhamento contínuo de ROI, faturamento e CPA."], ["PARA QUEM", "Yateo, agência de crescimento digital."]] },
+      { title: "AGENTES & MODELOS DE IA", tags: "IA · AUTOMAÇÃO · OPERAÇÕES", facts: [["DESAFIO", "Mensagens, follow-ups e tarefas repetitivas acabam consumindo tempo, atenção e oportunidades."], ["MISSÃO", "Criar agentes e automações capazes de assumir parte dessa execução."], ["IMPLEMENTAÇÃO", "Integrações com WhatsApp, Instagram, e-mail, Shopify, Klaviyo, Brevo, n8n e WooCommerce."], ["IMPACTO", "94% das mensagens tratadas sem intervenção e mais de 12.000 conversas gerenciadas por mês."], ["PARA QUEM", "Dayloom."]] },
+    ],
+    ctaEyebrow: "ALGUM DESSES PROBLEMAS PARECE FAMILIAR?", ctaHeadline: "ME CONTE O SEU.", ctaText: "Você não precisa ter a solução pronta. Me conte o que está travando, o que quer alcançar e o que já tentou até aqui.", cta: "FALAR SOBRE MEU PROJETO ↗",
+  },
+  contactPage: { eyebrow: "CONTATO / SEU PROJETO", headline: ["ME CONTE", "O QUE ESTÁ TRAVANDO."], intro: "Você não precisa chegar com a solução definida. Me conte o que quer alcançar, o que está impedindo o avanço e onde precisa chegar.", email: "E-MAIL", phone: "TELEFONE", whatsapp: "WHATSAPP" },
+};
+
 const ar: SiteCopy = {
   nav: { home: "الرئيسية", services: "الخدمات", projects: "المشاريع", contact: "لنتحدث عن مشروعك", homeDesc: "نبدأ من المشكلة", servicesDesc: "نختار الرافعة المناسبة", projectsDesc: "نرى الدليل", contactDesc: "أخبرني بما يعيق المشروع", mobileEyebrow: "أين يقف مشروعك الآن؟", mobileIntro: "نفهم. نختار. نتحقق. ثم نبدأ الحديث عن المشروع.", available: "متاح لمشاريع جديدة", language: "اللغة" },
   hero: {
@@ -336,7 +373,7 @@ const ko: SiteCopy = {
       { title: "스마트 의료 클리닉", tags: "웹 · 디지털 경험 · AI", facts: [["과제", "환자가 어디로 가야 하는지, 무엇을 준비해야 하는지, 다음 단계가 무엇인지 빠르게 이해해야 했습니다."], ["미션", "두 곳의 심장 전문 클리닉에 명확한 디지털 경험을 설계했습니다."], ["구현", "정보 구조, 환자 여정, 웹 설계, 실제 진료 환경에 맞춘 스마트 기능을 구성했습니다."], ["효과", "진료 전부터 더 명확하고 신뢰할 수 있으며 사용하기 쉬운 디지털 접점을 만들었습니다."], ["대상", "심장 전문 클리닉."]] },
       { title: "축구 클럽", tags: "마케팅 · 커뮤니케이션 · 성장", facts: [["과제", "확장 중인 시장에서 브랜드 정체성을 유지하면서 인지도를 키워야 했습니다."], ["미션", "PSG Academy USA의 성장 과정에서 노출과 커뮤니케이션을 지원했습니다."], ["구현", "네트워크, PSG US Development Academy, Pro Summer Camps 관련 커뮤니케이션을 진행했습니다."], ["효과", "미국 네트워크 확장과 국제 프로그램을 통해 브랜드 접점을 강화했습니다."], ["대상", "PSG Academy USA."]] },
       { title: "부동산 회사", tags: "디지털 마케팅 · 획득 · 콘텐츠", facts: [["과제", "온라인 노출이 실제로 질 높은 문의로 이어지지 않으면 의미가 없습니다."], ["미션", "부동산 회사의 가시성과 고객 획득을 강화했습니다."], ["구현", "콘텐츠, 랜딩 페이지, 에디토리얼 전략, 소셜 미디어, 검색 분석, 트래킹을 구성했습니다."], ["효과", "수요를 포착하고 성과를 측정하며 질 높은 리드를 만들 수 있는 디지털 구조를 갖췄습니다."], ["대상", "Egila 부동산 회사."]] },
-      { title: "대형 유통", tags: "데이터 · 자동화 · 세분화", facts: [["과제", "중복, 누락 데이터, अस्पष्ट한 세그먼트가 쌓이면 고객 데이터베이스는 빠르게 활용 가치를 잃습니다."], ["미션", "고객 파일을 실제 영업에 쓸 수 있는 도구로 바꿨습니다."], ["구현", "데이터 정리, 분류, 연결 폼, 모니터링 대시보드, 지역·프로필·고객 유형별 세분화를 구성했습니다."], ["효과", "WhatsApp 및 이메일 캠페인에 바로 활용할 수 있는 구조화된 데이터가 되었고 재가공 시간도 줄였습니다."], ["대상", "Promocash."]] },
+      { title: "대형 유통", tags: "데이터 · 자동화 · 세분화", facts: [["과제", "중복, 누락 데이터, 모호한 세그먼트가 쌓이면 고객 데이터베이스는 빠르게 활용 가치를 잃습니다."], ["미션", "고객 파일을 실제 영업에 쓸 수 있는 도구로 바꿨습니다."], ["구현", "데이터 정리, 분류, 연결 폼, 모니터링 대시보드, 지역·프로필·고객 유형별 세분화를 구성했습니다."], ["효과", "WhatsApp 및 이메일 캠페인에 바로 활용할 수 있는 구조화된 데이터가 되었고 재가공 시간도 줄였습니다."], ["대상", "Promocash."]] },
       { title: "디지털 마케팅 에이전시", tags: "검색 광고 · SOCIAL ADS · 성과", facts: [["과제", "예산이 커질수록 비용, 유입 품질, 수익성이 모든 의사결정에 숫자로 보여야 합니다."], ["미션", "다국어 포트폴리오의 고객 획득 캠페인을 운영하고 최적화했습니다."], ["구현", "검색 광고, Social Ads, A/B 테스트, CPC·예산 관리, Quality Score, 트래킹, 검색 분석, 리포팅을 수행했습니다."], ["효과", "100개 이상의 다국어 계정을 다루며 ROI, 매출, CPA를 지속적으로 모니터링했습니다."], ["대상", "Yateo 디지털 성장 에이전시."]] },
       { title: "AI 에이전트 & 모델", tags: "AI · 자동화 · 운영", facts: [["과제", "메시지, 후속 연락, 반복 업무는 시간뿐 아니라 집중력과 기회까지 소모합니다."], ["미션", "그 실행의 일부를 맡을 수 있는 AI 에이전트와 자동화를 설계했습니다."], ["구현", "WhatsApp, Instagram, 이메일, Shopify, Klaviyo, Brevo, n8n, WooCommerce와 연결했습니다."], ["효과", "메시지의 94%를 사람의 개입 없이 처리하고 매월 12,000건 이상의 대화를 관리합니다."], ["대상", "Dayloom."]] },
     ],
@@ -345,5 +382,5 @@ const ko: SiteCopy = {
   contactPage: { eyebrow: "문의 / 프로젝트", headline: ["먼저", "막힌 지점을 알려주세요."], intro: "해결책을 정해 오실 필요는 없습니다. 무엇을 이루고 싶은지, 무엇이 진행을 막고 있는지, 어디까지 가고 싶은지 알려주세요.", email: "이메일", phone: "전화", whatsapp: "WHATSAPP" },
 };
 
-export const copyByLocale: Record<Locale, SiteCopy> = { fr, en, es, ar, ja, zh, ko };
+export const copyByLocale: Record<Locale, SiteCopy> = { fr, en, es, pt, ar, ja, zh, ko };
 export const getCopy = (locale: Locale = "fr") => copyByLocale[locale] || fr;
