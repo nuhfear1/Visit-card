@@ -101,7 +101,13 @@ const companyItems: CompanyItem[] = [
     wordmark: true,
   },
   { name: "Egila", meta: "Real estate", surface: "bg-[#FEF8E8]" },
-  { name: "Dayloom", meta: "Digital", surface: "bg-[#FEF8E8]" },
+  {
+    name: "Dayloom",
+    meta: "Digital",
+    logo: "/Visit-card/dayloom-logo.png",
+    surface: "bg-[#070707]",
+    imageClass: "max-h-16 max-w-[82%]",
+  },
 ];
 
 function CompanyCard({ item, index }: { item: CompanyItem; index: number }) {
