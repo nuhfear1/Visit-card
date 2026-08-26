@@ -100,7 +100,13 @@ const companyItems: CompanyItem[] = [
     imageClass: "max-h-20 max-w-[42%]",
     wordmark: true,
   },
-  { name: "Egila", meta: "Real estate", surface: "bg-[#FEF8E8]" },
+  {
+    name: "Egila",
+    meta: "Real estate",
+    logo: "/Visit-card/egila-logo.png",
+    surface: "bg-white",
+    imageClass: "max-h-36 max-w-[72%]",
+  },
   {
     name: "Dayloom",
     meta: "Digital",
