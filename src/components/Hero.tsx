@@ -4,35 +4,35 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { usePageTransition } from "@/components/PageTransition";
+import { getCopy, localizedPath, type Locale } from "@/lib/i18n";
 
-export default function Hero() {
+export default function Hero({ locale = "fr" }: { locale?: Locale }) {
   const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const { startTransition } = usePageTransition();
-
-  const phrases = useMemo(() => [
-    "ACQUISITION QUI PLAFONNE",
-    "TÂCHES TROP MANUELLES",
-    "SITE QUI NE CONVERTIT PAS",
-    "OUTILS DÉCONNECTÉS",
-  ], []);
+  const copy = getCopy(locale).hero;
+  const phrases = useMemo(() => copy.phrases, [copy.phrases]);
 
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const current = phrases[phraseIndex];
+    setPhraseIndex(0);
+    setDisplayText("");
+    setDeleting(false);
+  }, [locale]);
+
+  useEffect(() => {
+    const current = phrases[phraseIndex] || phrases[0];
     const speed = deleting ? 35 : 70;
     const timer = window.setTimeout(() => {
       if (!deleting) {
         const next = current.slice(0, displayText.length + 1);
         setDisplayText(next);
-        if (next === current) {
-          window.setTimeout(() => setDeleting(true), 1300);
-        }
+        if (next === current) window.setTimeout(() => setDeleting(true), 1300);
       } else {
         const next = current.slice(0, Math.max(0, displayText.length - 1));
         setDisplayText(next);
@@ -137,61 +137,52 @@ export default function Hero() {
     };
   }, []);
 
+  const isRtl = locale === "ar";
+
   return (
-    <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#E4E2E3] text-[#161616] font-jakarta">
+    <section ref={containerRef} dir={isRtl ? "rtl" : "ltr"} className="relative w-full h-screen overflow-hidden bg-[#E4E2E3] text-[#161616] font-jakarta">
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
 
       <div className="absolute top-6 left-8 right-8 z-40 flex items-start justify-between">
         <div ref={logoRef} className="flex items-center gap-3">
           <span className="h-2.5 w-2.5 rounded-full bg-[#F44A22] shadow-[0_0_0_4px_rgba(244,74,34,.12)]" aria-hidden="true" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#161616]/70 md:text-[11px]">DISPONIBLE POUR DE NOUVEAUX PROJETS</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#161616]/70 md:text-[11px]">{copy.available}</span>
         </div>
 
-        <div className="hidden lg:flex max-w-[350px] flex-col items-end gap-3 text-right">
+        <div className={`hidden lg:flex max-w-[350px] flex-col gap-3 ${isRtl ? "items-start text-left" : "items-end text-right"}`}>
           <div className="font-cormorant text-3xl italic">Gary WILFRED-BORILLA</div>
-          <p className="text-xs leading-relaxed text-[#161616]/75">
-            Pas besoin d’avoir déjà choisi la solution. Dites-moi ce qui bloque et où vous voulez aller. J’identifie le levier utile — stratégie, IA, web ou acquisition.
-          </p>
-          <button onClick={() => startTransition("/contact")} className="rounded-full border border-[#161616]/30 px-4 py-2 text-[10px] font-bold tracking-[0.18em] transition hover:border-[#F44A22] hover:text-[#F44A22]">
-            ME DIRE CE QUI BLOQUE ↗
+          <p className="text-xs leading-relaxed text-[#161616]/75">{copy.intro}</p>
+          <button onClick={() => startTransition(localizedPath(locale, "/contact"))} className="rounded-full border border-[#161616]/30 px-4 py-2 text-[10px] font-bold tracking-[0.14em] transition hover:border-[#F44A22] hover:text-[#F44A22]">
+            {copy.cta}
           </button>
         </div>
       </div>
 
       <div ref={contentRef} className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center -translate-y-8 select-none">
-          <div className="font-oswald text-[7.5vw] font-black uppercase leading-[0.82] tracking-tighter text-[#161616]/10">LE PROBLÈME D’ABORD.</div>
+          <div className="font-oswald text-[7.5vw] font-black uppercase leading-[0.82] tracking-tighter text-[#161616]/10 text-center px-4">{copy.lead}</div>
           <div className="mt-4 min-h-[1.2em] px-5 text-center font-oswald text-[5.6vw] md:text-[6.5vw] font-black uppercase leading-[0.9] tracking-tighter text-stroke-orange">
             {displayText}<span className="animate-pulse">|</span>
           </div>
         </div>
 
-        <img
-          src="/Visit-card/gary-hero.webp"
-          alt="Gary WILFRED-BORILLA"
-          className="absolute bottom-10 left-1/2 z-20 h-[66vh] w-auto max-w-[90vw] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)] sm:bottom-11 sm:h-[70vh] sm:max-w-[72vw] md:bottom-12 md:h-[74vh] md:max-w-[58vw] lg:h-[78vh] lg:max-w-[44vw] xl:h-[80vh] xl:max-h-[860px] xl:max-w-[38vw]"
-        />
+        <img src="/Visit-card/gary-hero.webp" alt="Gary WILFRED-BORILLA" className="absolute bottom-10 left-1/2 z-20 h-[66vh] w-auto max-w-[90vw] -translate-x-1/2 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,.18)] sm:bottom-11 sm:h-[70vh] sm:max-w-[72vw] md:bottom-12 md:h-[74vh] md:max-w-[58vw] lg:h-[78vh] lg:max-w-[44vw] xl:h-[80vh] xl:max-h-[860px] xl:max-w-[38vw]" />
 
-        <div className="pointer-events-auto absolute bottom-24 left-8 z-30 hidden w-64 flex-col gap-4 lg:flex">
-          {[
-            ["8+", "ANNÉES D’EXPÉRIENCE"],
-            ["150+", "PROJETS & MISSIONS"],
-            ["96 %", "SATISFACTION CLIENT"],
-            ["21 JOURS", "DÉLAI MOYEN DE LIVRAISON"],
-          ].map(([title, label]) => (
-            <div key={title} className="border-t border-[#161616]/15 pt-3">
+        <div className={`pointer-events-auto absolute bottom-24 z-30 hidden w-64 flex-col gap-4 lg:flex ${isRtl ? "right-8" : "left-8"}`}>
+          {copy.stats.map(([title, label]) => (
+            <div key={title + label} className="border-t border-[#161616]/15 pt-3">
               <div className="font-oswald text-2xl font-bold text-[#F44A22]">{title}</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#161616]/55">{label}</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[#161616]/55">{label}</div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="absolute bottom-6 left-1/2 z-40 w-[110vw] max-w-[110%] -translate-x-1/2 -rotate-2 overflow-hidden border-y border-[#161616]/20 bg-[#F44A22] py-3.5 shadow-lg">
+      <div className="absolute bottom-6 left-1/2 z-40 w-[110vw] max-w-[110%] -translate-x-1/2 -rotate-2 overflow-hidden border-y border-[#161616]/20 bg-[#F44A22] py-3.5 shadow-lg" dir="ltr">
         <div className="animate-marquee flex w-max items-center gap-12 whitespace-nowrap font-oswald text-base font-extrabold uppercase tracking-widest text-[#FEF8E8] md:text-lg">
           {Array.from({ length: 4 }).map((_, index) => (
             <span key={index} className="flex items-center gap-12">
-              <span>STRATÉGIE QUAND LA DIRECTION MANQUE</span><span>✦</span><span>IA QUAND LE MANUEL PREND TROP DE TEMPS</span><span>✦</span><span>WEB QUAND L’EXPÉRIENCE FREINE</span><span>✦</span><span>ACQUISITION QUAND LA CROISSANCE PLAFONNE</span><span>✦</span>
+              {copy.marquee.map((item) => <span key={item} className="flex items-center gap-12"><span>{item}</span><span>✦</span></span>)}
             </span>
           ))}
         </div>
