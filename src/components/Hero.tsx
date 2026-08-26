@@ -13,10 +13,10 @@ export default function Hero() {
   const { startTransition } = usePageTransition();
 
   const phrases = useMemo(() => [
-    "STRATÉGIE & CROISSANCE",
-    "AGENTS IA & AUTOMATISATION",
-    "WEB & EXPÉRIENCES DIGITALES",
-    "MARKETING DIGITAL & COMMUNICATION",
+    "ACQUISITION QUI PLAFONNE",
+    "TÂCHES TROP MANUELLES",
+    "SITE QUI NE CONVERTIT PAS",
+    "OUTILS DÉCONNECTÉS",
   ], []);
 
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -147,21 +147,21 @@ export default function Hero() {
           <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#161616]/70 md:text-[11px]">DISPONIBLE POUR DE NOUVEAUX PROJETS</span>
         </div>
 
-        <div className="hidden lg:flex max-w-[320px] flex-col items-end gap-3 text-right">
+        <div className="hidden lg:flex max-w-[350px] flex-col items-end gap-3 text-right">
           <div className="font-cormorant text-3xl italic">Gary WILFRED-BORILLA</div>
           <p className="text-xs leading-relaxed text-[#161616]/75">
-            J’interviens en stratégie, intelligence artificielle, web et marketing pour résoudre des problèmes concrets et faire avancer les projets.
+            Pas besoin d’avoir déjà choisi la solution. Dites-moi ce qui bloque et où vous voulez aller. J’identifie le levier utile — stratégie, IA, web ou acquisition.
           </p>
           <button onClick={() => startTransition("/contact")} className="rounded-full border border-[#161616]/30 px-4 py-2 text-[10px] font-bold tracking-[0.18em] transition hover:border-[#F44A22] hover:text-[#F44A22]">
-            PARLONS DE VOTRE PROJET ↗
+            ME DIRE CE QUI BLOQUE ↗
           </button>
         </div>
       </div>
 
       <div ref={contentRef} className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center -translate-y-8 select-none">
-          <div className="font-oswald text-[9vw] font-black uppercase leading-[0.8] tracking-tighter text-[#161616]/10">JE CONÇOIS</div>
-          <div className="mt-4 min-h-[1.2em] px-5 text-center font-oswald text-[7vw] md:text-[8vw] font-black uppercase leading-[0.9] tracking-tighter text-stroke-orange">
+          <div className="font-oswald text-[7.5vw] font-black uppercase leading-[0.82] tracking-tighter text-[#161616]/10">LE PROBLÈME D’ABORD.</div>
+          <div className="mt-4 min-h-[1.2em] px-5 text-center font-oswald text-[5.6vw] md:text-[6.5vw] font-black uppercase leading-[0.9] tracking-tighter text-stroke-orange">
             {displayText}<span className="animate-pulse">|</span>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default function Hero() {
         <div className="animate-marquee flex w-max items-center gap-12 whitespace-nowrap font-oswald text-base font-extrabold uppercase tracking-widest text-[#FEF8E8] md:text-lg">
           {Array.from({ length: 4 }).map((_, index) => (
             <span key={index} className="flex items-center gap-12">
-              <span>STRATÉGIE & CROISSANCE</span><span>✦</span><span>AGENTS IA & AUTOMATISATION</span><span>✦</span><span>WEB & EXPÉRIENCES DIGITALES</span><span>✦</span><span>MARKETING DIGITAL & COMMUNICATION</span><span>✦</span>
+              <span>STRATÉGIE QUAND LA DIRECTION MANQUE</span><span>✦</span><span>IA QUAND LE MANUEL PREND TROP DE TEMPS</span><span>✦</span><span>WEB QUAND L’EXPÉRIENCE FREINE</span><span>✦</span><span>ACQUISITION QUAND LA CROISSANCE PLAFONNE</span><span>✦</span>
             </span>
           ))}
         </div>
