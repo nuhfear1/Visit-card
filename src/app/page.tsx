@@ -1,4 +1,7 @@
 import Hero from "@/components/Hero";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata("fr", "home", "/");
 
 export default function Home() {
   return (
