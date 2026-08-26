@@ -18,15 +18,15 @@ const projects = [
   {
     num: "02",
     title: "PSG ACADEMY",
-    tags: "PROJET SÉLECTIONNÉ",
+    tags: "MARKETING · COMMUNICATION · DÉVELOPPEMENT",
     primary: "#00F2FE",
     secondary: "#4FACFE",
     facts: [
-      ["QUOI", "Mission réalisée pour PSG Academy."],
-      ["POUR QUI", "PSG Academy."],
-      ["POURQUOI", "À préciser."],
-      ["COMMENT", "À préciser."],
-      ["RÉSULTAT", "À préciser."],
+      ["QUOI", "Mission de marketing et communication autour du développement de PSG Academy USA."],
+      ["POUR QUI", "PSG Academy USA."],
+      ["POURQUOI", "Soutenir la visibilité d’un réseau en expansion et valoriser ses programmes de formation aux États-Unis."],
+      ["COMMENT", "Communication autour du développement du réseau, du lancement de la PSG US Development Academy et des Pro Summer Camps."],
+      ["RÉSULTAT", "Une présence de marque portée par l’expansion du réseau américain, le lancement de la Development Academy en 2021 et des camps réunissant des participants de 23 nationalités."],
     ],
   },
   {
