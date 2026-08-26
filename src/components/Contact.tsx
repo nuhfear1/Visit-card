@@ -3,12 +3,12 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ArrowUpRight, Mail } from "lucide-react";
+import { ArrowUpRight, Mail, Phone, MessageCircle } from "lucide-react";
 
 const links = [
   { label: "EMAIL", value: "À CONFIGURER", mark: "@", icon: Mail },
-  { label: "LINKEDIN", value: "À CONFIGURER", mark: "in" },
-  { label: "GITHUB", value: "nuhfear1", mark: "GH", href: "https://github.com/nuhfear1" },
+  { label: "TÉLÉPHONE", value: "À CONFIGURER", mark: "TEL", icon: Phone },
+  { label: "WHATSAPP", value: "À CONFIGURER", mark: "WA", icon: MessageCircle },
 ];
 
 export default function Contact() {
