@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import ImageMaskGrid from "@/components/ui/image-mask";
-import TrustRails from "@/components/TrustRails";
+import ProjectBrandWall from "@/components/ProjectBrandWall";
 import { getCopy, type Locale } from "@/lib/i18n";
 
 export default function ProjectsView({ locale = "fr" }: { locale?: Locale }) {
@@ -36,7 +36,7 @@ export default function ProjectsView({ locale = "fr" }: { locale?: Locale }) {
       </div>
 
       <div className="relative z-10 mt-14 md:mt-20">
-        <TrustRails locale={locale} variant="projects" />
+        <ProjectBrandWall locale={locale} />
       </div>
     </main>
   );
