@@ -32,15 +32,15 @@ const projects = [
   {
     num: "03",
     title: "AGENCE IMMOBILIÈRE",
-    tags: "PROJET SÉLECTIONNÉ",
+    tags: "MARKETING DIGITAL · ACQUISITION · CONTENU",
     primary: "#9B51E0",
     secondary: "#E94057",
     facts: [
-      ["QUOI", "Mission réalisée pour une agence immobilière."],
-      ["POUR QUI", "Agence immobilière."],
-      ["POURQUOI", "À préciser."],
-      ["COMMENT", "À préciser."],
-      ["RÉSULTAT", "À préciser."],
+      ["QUOI", "Développement de la visibilité digitale et de l’acquisition pour une agence immobilière."],
+      ["POUR QUI", "Egila, agence immobilière."],
+      ["POURQUOI", "Renforcer la présence en ligne et générer des leads qualifiés."],
+      ["COMMENT", "Contenus SEO, optimisation d’articles, landing pages, stratégie de contenu, réseaux sociaux, analyse des recherches et tracking."],
+      ["RÉSULTAT", "Un dispositif digital structuré autour de la visibilité, de l’acquisition et du suivi des performances."],
     ],
   },
   {
