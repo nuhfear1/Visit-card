@@ -46,15 +46,15 @@ const projects = [
   {
     num: "04",
     title: "PROMOCASH",
-    tags: "PROJET SÉLECTIONNÉ",
+    tags: "DATA · AUTOMATISATION · SEGMENTATION",
     primary: "#FFAD29",
     secondary: "#F44A22",
     facts: [
-      ["QUOI", "Mission réalisée pour Promocash."],
+      ["QUOI", "Structuration et automatisation du fichier clients pour le transformer en outil commercial exploitable."],
       ["POUR QUI", "Promocash."],
-      ["POURQUOI", "À préciser."],
-      ["COMMENT", "À préciser."],
-      ["RÉSULTAT", "À préciser."],
+      ["POURQUOI", "Mieux connaître les clients, éviter les messages génériques et rendre les actions commerciales plus précises."],
+      ["COMMENT", "Nettoyage des doublons, classement des données, formulaire relié au fichier, tableau de suivi et segmentation par ville, type de client, etc."],
+      ["RÉSULTAT", "Une base clients structurée, segmentable et prête pour des campagnes WhatsApp ou email plus ciblées."],
     ],
   },
 ];
