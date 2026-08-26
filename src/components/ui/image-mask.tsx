@@ -43,6 +43,20 @@ const projects = [
       ["RÉSULTAT", "À préciser."],
     ],
   },
+  {
+    num: "04",
+    title: "PROMOCASH",
+    tags: "PROJET SÉLECTIONNÉ",
+    primary: "#FFAD29",
+    secondary: "#F44A22",
+    facts: [
+      ["QUOI", "Mission réalisée pour Promocash."],
+      ["POUR QUI", "Promocash."],
+      ["POURQUOI", "À préciser."],
+      ["COMMENT", "À préciser."],
+      ["RÉSULTAT", "À préciser."],
+    ],
+  },
 ];
 
 export default function ImageMaskGrid() {
@@ -55,9 +69,11 @@ export default function ImageMaskGrid() {
             className={`group relative min-h-[520px] overflow-hidden border-2 border-[#161616] bg-[#161616] ${
               index === 0
                 ? "lg:col-span-2 rounded-tl-[5rem] rounded-br-[2rem]"
-                : index % 2 === 0
-                  ? "rounded-tl-[5rem] rounded-br-[2rem]"
-                  : "rounded-tr-[5rem] rounded-bl-[2rem]"
+                : index === 3
+                  ? "lg:col-span-2 rounded-tr-[5rem] rounded-bl-[2rem]"
+                  : index % 2 === 0
+                    ? "rounded-tl-[5rem] rounded-br-[2rem]"
+                    : "rounded-tr-[5rem] rounded-bl-[2rem]"
             }`}
           >
             <div className="absolute -left-[20%] -top-[15%] h-[75%] w-[90%] rounded-full blur-[55px] transition-transform duration-700 group-hover:scale-110" style={{ backgroundColor: project.primary }} />
