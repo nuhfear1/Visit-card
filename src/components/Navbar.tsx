@@ -1,7 +1,6 @@
 "use client";
 
-import "@/lib/i18n-gcf";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Home, SlidersHorizontal, BadgeCheck, MessageCircle, Menu, X, Languages, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -59,6 +58,7 @@ export default function Navbar() {
   const { startTransition } = usePageTransition();
   const [isOpen, setIsOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const languageRef = useRef<HTMLDivElement>(null);
   const locale = getLocaleFromPathname(pathname);
   const copy = getCopy(locale).nav;
   const basePath = stripLocaleFromPathname(pathname);
@@ -73,21 +73,34 @@ export default function Navbar() {
   useEffect(() => {
     setIsOpen(false);
     setLanguageOpen(false);
-    document.documentElement.lang = locale === "zh" ? "zh-CN" : locale === "es" ? "es-419" : String(locale) === "gcf" ? "gcf" : locale;
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : locale === "es" ? "es-419" : locale === "pt" ? "pt-BR" : locale === "en" ? "en-US" : locale === "ja" ? "ja-JP" : locale === "ko" ? "ko-KR" : locale;
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
   }, [pathname, locale]);
+
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      if (languageOpen && languageRef.current && !languageRef.current.contains(event.target as Node)) setLanguageOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setLanguageOpen(false);
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [languageOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
     };
   }, [isOpen]);
 
@@ -98,7 +111,7 @@ export default function Navbar() {
     if (pathname !== href) startTransition(href);
   };
 
-  const currentLanguage = localeOptions.find((item) => String(item.code) === String(locale))?.label || "Français";
+  const currentLanguage = localeOptions.find((item) => item.code === locale)?.label || "Français";
 
   return (
     <>
@@ -121,18 +134,18 @@ export default function Navbar() {
             </div>
           </GlassEffect>
 
-          <div className="relative">
-            <button type="button" onClick={() => setLanguageOpen((open) => !open)} aria-expanded={languageOpen} aria-label={copy.language} className="flex h-[52px] items-center gap-2 rounded-full border border-white/35 bg-white/55 px-4 text-xs font-semibold text-[#161616] shadow-[0_6px_20px_rgba(0,0,0,.12)] backdrop-blur-xl transition hover:bg-white/75">
+          <div ref={languageRef} className="relative">
+            <button type="button" onClick={() => setLanguageOpen((open) => !open)} aria-expanded={languageOpen} aria-haspopup="listbox" aria-label={copy.language} className="flex h-[52px] items-center gap-2 rounded-full border border-white/35 bg-white/55 px-4 text-xs font-semibold text-[#161616] shadow-[0_6px_20px_rgba(0,0,0,.12)] backdrop-blur-xl transition hover:bg-white/75">
               <Languages size={17} />
               <span>{currentLanguage}</span>
               <ChevronDown size={14} className={`transition-transform ${languageOpen ? "rotate-180" : ""}`} />
             </button>
             {languageOpen && (
-              <div className="absolute right-0 top-[60px] w-52 overflow-hidden rounded-2xl border border-[#161616]/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl">
+              <div role="listbox" className="absolute right-0 top-[60px] max-h-[min(420px,calc(100vh-96px))] w-52 overflow-y-auto overscroll-contain rounded-2xl border border-[#161616]/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl">
                 {localeOptions.map((option) => {
                   const href = localizedPath(option.code, basePath);
                   return (
-                    <Link key={String(option.code)} href={href} onClick={(event) => navigate(event, href)} className={`block rounded-xl px-3 py-2.5 text-sm transition ${String(option.code) === String(locale) ? "bg-[#F44A22] text-white" : "hover:bg-[#161616]/5"}`}>
+                    <Link key={option.code} href={href} onClick={(event) => navigate(event, href)} role="option" aria-selected={option.code === locale} className={`block rounded-xl px-3 py-2.5 text-sm transition ${option.code === locale ? "bg-[#F44A22] text-white" : "hover:bg-[#161616]/5"}`}>
                       {option.label}
                     </Link>
                   );
@@ -147,43 +160,43 @@ export default function Navbar() {
         {isOpen ? <X size={21} /> : <Menu size={21} />}
       </button>
 
-      <div id="mobile-navigation" aria-hidden={!isOpen} className={`fixed inset-0 z-[70] overflow-hidden bg-[#E4E2E3]/95 backdrop-blur-2xl transition-all duration-500 md:hidden ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}>
-        <div className="pointer-events-none absolute -left-24 top-28 h-72 w-72 rounded-full bg-[#F44A22]/15 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-[#7B2CBF]/10 blur-3xl" />
+      <div id="mobile-navigation" aria-hidden={!isOpen} className={`fixed inset-0 z-[70] overflow-y-auto overscroll-contain bg-[#E4E2E3]/95 backdrop-blur-2xl transition-all duration-500 md:hidden ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}>
+        <div className="pointer-events-none fixed -left-24 top-28 h-72 w-72 rounded-full bg-[#F44A22]/15 blur-3xl" />
+        <div className="pointer-events-none fixed -bottom-24 -right-20 h-80 w-80 rounded-full bg-[#7B2CBF]/10 blur-3xl" />
 
-        <div className="relative flex h-full flex-col px-6 pb-7 pt-24" dir={locale === "ar" ? "rtl" : "ltr"}>
-          <div className="mb-5">
+        <div className="relative flex min-h-full flex-col px-5 pb-7 pt-24 sm:px-6" dir={locale === "ar" ? "rtl" : "ltr"}>
+          <div className="mb-5 shrink-0">
             <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F44A22]">{copy.mobileEyebrow}</div>
             <p className="mt-2 max-w-xs text-xs leading-5 text-[#161616]/55">{copy.mobileIntro}</p>
           </div>
 
-          <nav className="flex flex-1 flex-col justify-center" aria-label="Navigation mobile">
+          <nav className="flex flex-col justify-center" aria-label="Navigation mobile">
             {navItems.map((item, index) => {
               const isActive = pathname === item.href;
               const isCta = item.cta;
               return (
                 <Link key={item.href} href={item.href} onClick={(event) => navigate(event, item.href)} tabIndex={isOpen ? 0 : -1} className={`group flex items-center justify-between border-t border-[#161616]/15 py-4 transition-all duration-300 ${isCta || isActive ? "text-[#F44A22]" : "text-[#161616]"}`}>
-                  <div className="flex min-w-0 items-start gap-4">
-                    <span className="mt-1 text-[10px] font-bold tracking-[0.2em] text-[#161616]/35">0{index + 1}</span>
+                  <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                    <span className="mt-1 shrink-0 text-[10px] font-bold tracking-[0.2em] text-[#161616]/35">0{index + 1}</span>
                     <div className="min-w-0">
-                      <span className={`block font-oswald font-black uppercase leading-none tracking-tight ${isCta ? "text-[8.5vw]" : "text-[10vw]"}`}>{item.label}</span>
-                      <span className={`mt-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] ${isCta ? "text-[#F44A22]/70" : "text-[#161616]/45"}`}>{item.description}</span>
+                      <span className={`block break-words font-oswald font-black uppercase leading-[0.95] tracking-tight ${isCta ? "text-[8vw] sm:text-[8.5vw]" : "text-[9vw] sm:text-[10vw]"}`}>{item.label}</span>
+                      <span className={`mt-1.5 block text-[9px] font-bold uppercase tracking-[0.1em] ${isCta ? "text-[#F44A22]/70" : "text-[#161616]/45"}`}>{item.description}</span>
                     </div>
                   </div>
-                  <span className={`ml-3 text-2xl transition-transform duration-300 group-active:translate-x-1 ${isActive ? "rotate-45" : ""}`}>↗</span>
+                  <span className={`ml-3 shrink-0 text-2xl transition-transform duration-300 group-active:translate-x-1 ${isActive ? "rotate-45" : ""}`}>↗</span>
                 </Link>
               );
             })}
             <div className="border-t border-[#161616]/15" />
           </nav>
 
-          <div className="mt-4">
+          <div className="mt-5 shrink-0">
             <div className="mb-2 flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#161616]/45"><Languages size={14} />{copy.language}</div>
             <div className="flex flex-wrap gap-2" dir="ltr">
               {localeOptions.map((option) => {
                 const href = localizedPath(option.code, basePath);
                 return (
-                  <Link key={String(option.code)} href={href} onClick={(event) => navigate(event, href)} tabIndex={isOpen ? 0 : -1} className={`rounded-full border px-3 py-2 text-[10px] font-semibold transition ${String(option.code) === String(locale) ? "border-[#F44A22] bg-[#F44A22] text-white" : "border-[#161616]/15 bg-white/35 text-[#161616]/65"}`}>
+                  <Link key={option.code} href={href} onClick={(event) => navigate(event, href)} tabIndex={isOpen ? 0 : -1} className={`rounded-full border px-3 py-2 text-[10px] font-semibold transition ${option.code === locale ? "border-[#F44A22] bg-[#F44A22] text-white" : "border-[#161616]/15 bg-white/35 text-[#161616]/65"}`}>
                     {option.label}
                   </Link>
                 );
@@ -191,8 +204,8 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#161616]/50">
-            <span className="h-2 w-2 rounded-full bg-[#F44A22]" />
+          <div className="flex shrink-0 items-center gap-2 pt-5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#161616]/50">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#F44A22]" />
             {copy.available}
           </div>
         </div>
