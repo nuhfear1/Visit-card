@@ -42,7 +42,7 @@ const copyByLocale: Record<Locale, BrandWallCopy> = {
   pt: {
     eyebrow: "CONTEXTOS REAIS",
     title: "MISSÕES DIFERENTES. A MESMA EXIGÊNCIA DE RESULTADO.",
-    subtitle: "Esses ambientes mostram onde essa abordagem já foi colocada à prova: entender o desafio, escolher a alavanca certa e produzir un resultado útil no contexto real da empresa.",
+    subtitle: "Esses ambientes mostram onde essa abordagem já foi colocada à prova: entender o desafio, escolher a alavanca certa e produzir um resultado útil no contexto real da empresa.",
     companies: "Empresas & ambientes de projeto",
   },
   gcf: {
