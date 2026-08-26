@@ -50,6 +50,29 @@ body {
     animation: marquee 30s linear infinite;
   }
 
+  @keyframes trust-marquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-33.333%, 0, 0); }
+  }
+  .trust-rail-mask {
+    mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  }
+  .trust-rail-track {
+    display: flex;
+    width: max-content;
+    gap: 0.75rem;
+    animation: trust-marquee 34s linear infinite;
+    will-change: transform;
+  }
+  .trust-rail-reverse {
+    animation-direction: reverse;
+    animation-duration: 40s;
+  }
+  .trust-rail-mask:hover .trust-rail-track {
+    animation-play-state: paused;
+  }
+
   @keyframes float-fast-top {
     0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
     33% { transform: translateY(-15px) translateX(12px) scale(1.04); }
@@ -106,12 +129,19 @@ body {
   }
 
   .animate-marquee,
+  .trust-rail-track,
   .animate-float-fast-top,
   .animate-float-medium-mid,
   .animate-float-medium-mid-delayed,
   .animate-float-slow-bottom,
   .animate-pulse {
     animation: none !important;
+  }
+
+  .trust-rail-mask {
+    overflow-x: auto;
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 }
 
