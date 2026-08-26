@@ -189,6 +189,7 @@ const labels: Record<Locale, Labels> = {
 
 const SIMPLE_ICONS = "https://raw.githubusercontent.com/simple-icons/simple-icons/4a79bb55697c85b8bc9f3caa22be747e0277ad4f/icons";
 const LOBE_ICONS = "https://raw.githubusercontent.com/lobehub/lobe-icons/4aaf4ee1fb2678a7f989ea570f0f6ce14a9abf75/packages/static-svg/icons";
+const LINKEDIN_ICON = "https://raw.githubusercontent.com/twbs/icons/v1.11.3/icons/linkedin.svg";
 const simpleLogo = (slug: string) => `${SIMPLE_ICONS}/${slug}.svg`;
 const lobeLogo = (slug: string) => `${LOBE_ICONS}/${slug}.svg`;
 
@@ -210,7 +211,7 @@ const marketingItems: BrandItem[] = [
   { name: "Google Ads", meta: "SEA", logo: simpleLogo("googleads") },
   { name: "Meta Ads", meta: "Social Ads", logo: simpleLogo("meta") },
   { name: "TikTok Ads", meta: "Social Ads", logo: simpleLogo("tiktok") },
-  { name: "LinkedIn Ads", meta: "B2B Ads", logo: simpleLogo("linkedin") },
+  { name: "LinkedIn Ads", meta: "B2B Ads", logo: LINKEDIN_ICON },
   { name: "Google Analytics", meta: "Analytics", logo: simpleLogo("googleanalytics") },
   { name: "Google Tag Manager", meta: "Tracking", logo: simpleLogo("googletagmanager") },
   { name: "HubSpot", meta: "CRM", logo: simpleLogo("hubspot") },
