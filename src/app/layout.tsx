@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: "Gary WILFRED-BORILLA",
   description: "Stratégie, IA, web et acquisition au service de problèmes concrets et de projets qui doivent avancer.",
   icons: {
-    icon: [{ url: "/Visit-card/favicon.svg", type: "image/svg+xml" }],
-    shortcut: "/Visit-card/favicon.svg",
+    icon: [{ url: "/Visit-card/favicon.ico", type: "image/x-icon" }],
+    shortcut: "/Visit-card/favicon.ico",
   },
   openGraph: {
     siteName: "Gary WILFRED-BORILLA",
