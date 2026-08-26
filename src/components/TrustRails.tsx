@@ -79,7 +79,7 @@ export default function TrustRails({ locale, variant }: TrustRailsProps) {
 
   return (
     <section className={`${isProjects ? "bg-[#161616] text-white" : "bg-[#FEF8E8] text-[#161616]"} overflow-hidden border-y ${isProjects ? "border-white/10" : "border-[#161616]/10"}`} dir={locale === "ar" ? "rtl" : "ltr"}>
-      <div className="mx-auto max-w-7xl px-6 py-14 md:px-12 md:py-18 lg:px-20">
+      <div className="mx-auto max-w-7xl px-6 py-14 md:px-12 md:py-16 lg:px-20">
         <div className="grid gap-7 lg:grid-cols-[minmax(0,1.1fr)_minmax(300px,.9fr)] lg:items-end">
           <div>
             <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#F44A22]">
