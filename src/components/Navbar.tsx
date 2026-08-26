@@ -1,5 +1,6 @@
 "use client";
 
+import "@/lib/i18n-gcf";
 import React, { useEffect, useState } from "react";
 import { Home, SlidersHorizontal, BadgeCheck, MessageCircle, Menu, X, Languages, ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -72,7 +73,7 @@ export default function Navbar() {
   useEffect(() => {
     setIsOpen(false);
     setLanguageOpen(false);
-    document.documentElement.lang = locale === "zh" ? "zh-CN" : locale === "es" ? "es-419" : locale;
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : locale === "es" ? "es-419" : String(locale) === "gcf" ? "gcf" : locale;
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
   }, [pathname, locale]);
 
@@ -97,7 +98,7 @@ export default function Navbar() {
     if (pathname !== href) startTransition(href);
   };
 
-  const currentLanguage = localeOptions.find((item) => item.code === locale)?.label || "Français";
+  const currentLanguage = localeOptions.find((item) => String(item.code) === String(locale))?.label || "Français";
 
   return (
     <>
@@ -131,7 +132,7 @@ export default function Navbar() {
                 {localeOptions.map((option) => {
                   const href = localizedPath(option.code, basePath);
                   return (
-                    <Link key={option.code} href={href} onClick={(event) => navigate(event, href)} className={`block rounded-xl px-3 py-2.5 text-sm transition ${option.code === locale ? "bg-[#F44A22] text-white" : "hover:bg-[#161616]/5"}`}>
+                    <Link key={String(option.code)} href={href} onClick={(event) => navigate(event, href)} className={`block rounded-xl px-3 py-2.5 text-sm transition ${String(option.code) === String(locale) ? "bg-[#F44A22] text-white" : "hover:bg-[#161616]/5"}`}>
                       {option.label}
                     </Link>
                   );
@@ -182,7 +183,7 @@ export default function Navbar() {
               {localeOptions.map((option) => {
                 const href = localizedPath(option.code, basePath);
                 return (
-                  <Link key={option.code} href={href} onClick={(event) => navigate(event, href)} tabIndex={isOpen ? 0 : -1} className={`rounded-full border px-3 py-2 text-[10px] font-semibold transition ${option.code === locale ? "border-[#F44A22] bg-[#F44A22] text-white" : "border-[#161616]/15 bg-white/35 text-[#161616]/65"}`}>
+                  <Link key={String(option.code)} href={href} onClick={(event) => navigate(event, href)} tabIndex={isOpen ? 0 : -1} className={`rounded-full border px-3 py-2 text-[10px] font-semibold transition ${String(option.code) === String(locale) ? "border-[#F44A22] bg-[#F44A22] text-white" : "border-[#161616]/15 bg-white/35 text-[#161616]/65"}`}>
                     {option.label}
                   </Link>
                 );
