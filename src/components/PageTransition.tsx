@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
+import useReducedMotion from "@/hooks/useReducedMotion";
 
 interface TransitionContextType {
   startTransition: (href: string) => void;
@@ -42,12 +43,19 @@ const ColumnWithCurves = () => {
 
 export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
+  const reducedMotion = useReducedMotion();
   const isTransitioning = useRef(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const ladderRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const startTransition = (href: string) => {
     if (isTransitioning.current) return;
+
+    if (reducedMotion) {
+      router.push(href);
+      return;
+    }
+
     isTransitioning.current = true;
 
     if (overlayRef.current) {
@@ -99,6 +107,7 @@ export const PageTransitionProvider: React.FC<{ children: React.ReactNode }> = (
       <div
         ref={overlayRef}
         className="fixed inset-0 z-[9999] pointer-events-none flex"
+        aria-hidden="true"
       >
         {Array.from({ length: 6 }).map((_, i) => (
           <div
