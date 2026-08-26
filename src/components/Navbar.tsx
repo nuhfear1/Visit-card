@@ -17,6 +17,8 @@ interface GlassEffectProps {
   target?: string;
 }
 
+const normalizePath = (value: string) => value === "/" ? "/" : value.replace(/\/+$/, "");
+
 const GlassEffect: React.FC<GlassEffectProps> = ({ children, className = "", style = {}, href, target = "_blank" }) => {
   const glassStyle = {
     boxShadow: "0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1)",
@@ -57,6 +59,7 @@ const GlassFilter: React.FC = () => (
 
 export default function Navbar() {
   const pathname = usePathname();
+  const currentPath = normalizePath(pathname);
   const { startTransition } = usePageTransition();
   const [isOpen, setIsOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -117,7 +120,7 @@ export default function Navbar() {
     event.preventDefault();
     setIsOpen(false);
     setLanguageOpen(false);
-    if (pathname !== href) startTransition(href);
+    if (currentPath !== normalizePath(href)) startTransition(href);
   };
 
   const currentLanguage = localeOptions.find((item) => item.code === locale)?.label || "Français";
@@ -131,7 +134,7 @@ export default function Navbar() {
           <GlassEffect className={`rounded-full transition-all duration-500 hover:rounded-full ${usesCompactDesktopNav ? "p-1 hover:p-1.5" : "p-1.5 hover:p-2"}`}>
             <div className={`flex items-center justify-center rounded-full p-1 overflow-hidden ${usesCompactDesktopNav ? "gap-1" : "gap-2"}`}>
               {navItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = currentPath === normalizePath(item.href);
                 const isCta = item.cta;
                 return (
                   <Link key={item.href} href={item.href} onClick={(event) => navigate(event, item.href)} className={`group flex shrink-0 items-center whitespace-nowrap rounded-full transition-all duration-500 hover:scale-105 cursor-pointer ${usesCompactDesktopNav ? "px-3 py-2" : "px-4 py-2"} ${isCta ? "bg-[#F44A22] text-white shadow-[0_5px_18px_rgba(244,74,34,.18)] hover:bg-[#161616]" : isActive ? "bg-[#161616] text-white" : "bg-white/10 text-palette-stone hover:bg-[#161616] hover:text-white"}`} style={{ transformOrigin: "center center", transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}>
@@ -175,7 +178,7 @@ export default function Navbar() {
           </div>
           <nav className="flex flex-col justify-center" aria-label="Navigation mobile">
             {navItems.map((item, index) => {
-              const isActive = pathname === item.href;
+              const isActive = currentPath === normalizePath(item.href);
               const isCta = item.cta;
               return (
                 <Link key={item.href} href={item.href} onClick={(event) => navigate(event, item.href)} tabIndex={isOpen ? 0 : -1} className={`group flex items-center justify-between border-t border-[#161616]/15 py-4 transition-all duration-300 ${isCta || isActive ? "text-[#F44A22]" : "text-[#161616]"}`}>
