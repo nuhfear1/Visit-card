@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { allLocales, getCopy, localizedPath, type Locale } from "@/lib/i18n";
-import { getFaqCopy } from "@/lib/faq";
+import { getSanitizedFaqCopy } from "@/lib/faq-sanitized";
 import { getFaqTerminology } from "@/lib/faq-terminology";
 
 const SITE_URL = "https://nuhfear1.github.io/Visit-card";
@@ -32,7 +32,7 @@ export type SeoPage = "home" | "services" | "projects" | "faq" | "contact";
 
 export function createPageMetadata(locale: Locale, page: SeoPage, path: string): Metadata {
   const copy = getCopy(locale);
-  const faqCopy = getFaqCopy(locale);
+  const faqCopy = getSanitizedFaqCopy(locale);
   const faqTerminology = getFaqTerminology(locale);
   const pageTitle = page === "home"
     ? copy.hero.lead.replace(/\.$/, "")
@@ -55,7 +55,7 @@ export function createPageMetadata(locale: Locale, page: SeoPage, path: string):
           : copy.contactPage.intro;
 
   const title = page === "home"
-    ? `Gary WILFRED-BORILLA — ${pageTitle}`
+    ? `Gary WILFRED-BORILLA | ${pageTitle}`
     : `${pageTitle} | Gary WILFRED-BORILLA`;
 
   const url = absoluteUrl(locale, path);
@@ -77,7 +77,7 @@ export function createPageMetadata(locale: Locale, page: SeoPage, path: string):
           url: SOCIAL_IMAGE,
           width: 1200,
           height: 630,
-          alt: "Gary WILFRED-BORILLA — stratégie, IA, web et acquisition",
+          alt: "Gary WILFRED-BORILLA, stratégie, IA, web et acquisition",
         },
       ],
     },

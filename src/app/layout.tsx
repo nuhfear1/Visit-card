@@ -19,7 +19,7 @@ export const metadata: Metadata = {
         url: "/Visit-card/gary-services.webp",
         width: 1200,
         height: 630,
-        alt: "Gary WILFRED-BORILLA — stratégie, IA, web et acquisition",
+        alt: "Gary WILFRED-BORILLA, stratégie, IA, web et acquisition",
       },
     ],
   },

@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { ArrowUpRight, Plus } from "lucide-react";
-import { getFaqCopy } from "@/lib/faq";
+import { getSanitizedFaqCopy } from "@/lib/faq-sanitized";
 import { getFaqTerminology } from "@/lib/faq-terminology";
 import { localizedPath, type Locale } from "@/lib/i18n";
 
 export default function FaqView({ locale = "fr" }: { locale?: Locale }) {
-  const copy = getFaqCopy(locale);
+  const copy = getSanitizedFaqCopy(locale);
   const terminology = getFaqTerminology(locale);
   let count = 0;
   const eyebrowSuffix = copy.eyebrow.includes("/") ? copy.eyebrow.split("/").slice(1).join("/").trim() : copy.eyebrow;

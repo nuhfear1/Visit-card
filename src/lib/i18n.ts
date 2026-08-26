@@ -5,6 +5,7 @@ import {
   type SiteCopy,
 } from "@/lib/i18n-base";
 import { gcfCopy } from "@/lib/i18n-gcf-data";
+import { sanitizeTextContent } from "@/lib/text-sanitize";
 
 export type Locale = BaseLocale | "gcf";
 export type { SiteCopy } from "@/lib/i18n-base";
@@ -43,10 +44,10 @@ export const localizedPath = (locale: Locale, pathname: string) => {
   return base === "/" ? `/${locale}` : `/${locale}${base}`;
 };
 
-export const copyByLocale: Record<Locale, SiteCopy> = {
+export const copyByLocale: Record<Locale, SiteCopy> = sanitizeTextContent({
   ...(baseCopyByLocale as Record<BaseLocale, SiteCopy>),
   gcf: gcfCopy,
-};
+});
 
 export const getCopy = (locale: Locale = "fr") =>
-  locale === "gcf" ? gcfCopy : getBaseCopy(locale as BaseLocale);
+  sanitizeTextContent(locale === "gcf" ? gcfCopy : getBaseCopy(locale as BaseLocale));
