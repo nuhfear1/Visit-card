@@ -1,3 +1,4 @@
+import "@/lib/i18n-gcf";
 import About from "@/components/About";
 import { localizedLocales, type Locale } from "@/lib/i18n";
 import { notFound } from "next/navigation";
