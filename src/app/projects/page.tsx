@@ -35,10 +35,20 @@ export default function ProjectsPage() {
     >
       <div
         ref={titleRef}
-        className="pointer-events-none absolute left-6 top-6 z-20 text-3xl tracking-widest text-[#F44A22] drop-shadow-md md:left-8 md:text-4xl"
-        style={{ fontFamily: "'Oswald', sans-serif" }}
+        className="relative z-20 mb-10 px-6 md:mb-14 md:px-8"
       >
-        PROJETS
+        <div
+          className="text-xs font-bold uppercase tracking-[0.28em] text-[#F44A22] md:text-sm"
+          style={{ fontFamily: "'Oswald', sans-serif" }}
+        >
+          PROJETS / PREUVES
+        </div>
+        <h1 className="mt-4 max-w-6xl font-oswald text-5xl font-black uppercase leading-[0.9] tracking-tight md:text-7xl lg:text-8xl">
+          UN PROJET BLOQUÉ N’A PAS BESOIN D’UNE LISTE DE SERVICES. IL A BESOIN DU BON LEVIER.
+        </h1>
+        <p className="mt-6 max-w-3xl text-sm leading-relaxed text-[#161616]/70 md:text-base lg:text-lg">
+          Acquisition, expérience web, data, automatisation, IA : voici six situations où le travail a commencé par le problème — pas par une solution à vendre.
+        </p>
       </div>
 
       <div ref={gridRef} className="relative z-10 w-full max-w-full">
