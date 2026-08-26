@@ -83,6 +83,14 @@ body {
   }
 }
 
+@media (min-width: 768px) {
+  [role="listbox"] [role="option"]:not([aria-selected="true"]):hover {
+    background-color: rgba(244, 74, 34, 0.11);
+    color: #F44A22;
+    box-shadow: inset 0 0 0 1px rgba(244, 74, 34, 0.16);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:focus-within {
     scroll-behavior: auto;
