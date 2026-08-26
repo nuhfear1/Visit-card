@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Home, SlidersHorizontal, BadgeCheck, MessageCircle, Menu, X } from "lucide-react";
+import { Home, SlidersHorizontal, BadgeCheck, MessageCircle, Menu, X, Languages, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
+import { getCopy, getLocaleFromPathname, localizedPath, localeOptions, stripLocaleFromPathname } from "@/lib/i18n";
 
 interface GlassEffectProps {
   children: React.ReactNode;
@@ -56,30 +57,33 @@ export default function Navbar() {
   const pathname = usePathname();
   const { startTransition } = usePageTransition();
   const [isOpen, setIsOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const locale = getLocaleFromPathname(pathname);
+  const copy = getCopy(locale).nav;
+  const basePath = stripLocaleFromPathname(pathname);
 
   const navItems = [
-    { icon: <Home size={18} />, label: "Accueil", mobileLabel: "Accueil", description: "Partir du problème", href: "/" },
-    { icon: <SlidersHorizontal size={18} />, label: "Services", mobileLabel: "Services", description: "Choisir le bon levier", href: "/about" },
-    { icon: <BadgeCheck size={18} />, label: "Projets", mobileLabel: "Projets", description: "Voir les preuves", href: "/projects" },
-    { icon: <MessageCircle size={18} />, label: "Parler du projet", mobileLabel: "Parler du projet", description: "Me dire ce qui bloque", href: "/contact", cta: true },
+    { icon: <Home size={18} />, label: copy.home, description: copy.homeDesc, href: localizedPath(locale, "/") },
+    { icon: <SlidersHorizontal size={18} />, label: copy.services, description: copy.servicesDesc, href: localizedPath(locale, "/about") },
+    { icon: <BadgeCheck size={18} />, label: copy.projects, description: copy.projectsDesc, href: localizedPath(locale, "/projects") },
+    { icon: <MessageCircle size={18} />, label: copy.contact, description: copy.contactDesc, href: localizedPath(locale, "/contact"), cta: true },
   ];
 
   useEffect(() => {
     setIsOpen(false);
-  }, [pathname]);
+    setLanguageOpen(false);
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : locale === "es" ? "es-419" : locale;
+    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
+  }, [pathname, locale]);
 
   useEffect(() => {
     if (!isOpen) return;
-
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setIsOpen(false);
     };
-
     window.addEventListener("keydown", onKeyDown);
-
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
@@ -89,65 +93,67 @@ export default function Navbar() {
   const navigate = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault();
     setIsOpen(false);
+    setLanguageOpen(false);
     if (pathname !== href) startTransition(href);
   };
+
+  const currentLanguage = localeOptions.find((item) => item.code === locale)?.label || "Français";
 
   return (
     <>
       <GlassFilter />
 
-      <div className="fixed top-6 left-1/2 z-50 hidden -translate-x-1/2 md:block">
-        <GlassEffect className="rounded-full p-1.5 hover:p-2 hover:rounded-full transition-all duration-500">
-          <div className="flex items-center justify-center gap-2 rounded-full p-1 overflow-hidden">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              const isCta = item.cta;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={(event) => navigate(event, item.href)}
-                  className={`flex items-center px-4 py-2 rounded-full transition-all duration-500 hover:scale-105 cursor-pointer group ${
-                    isCta
-                      ? "bg-[#F44A22] text-white shadow-[0_5px_18px_rgba(244,74,34,.18)] hover:bg-[#161616]"
-                      : isActive
-                        ? "bg-[#161616] text-white"
-                        : "bg-white/10 text-palette-stone hover:bg-[#161616] hover:text-white"
-                  }`}
-                  style={{ transformOrigin: "center center", transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}
-                >
-                  {item.icon}
-                  <span className="ml-2 text-sm font-medium tracking-wide">{item.label}</span>
-                </Link>
-              );
-            })}
+      <div className="fixed top-6 left-1/2 z-50 hidden -translate-x-1/2 md:block" dir="ltr">
+        <div className="flex items-start gap-2">
+          <GlassEffect className="rounded-full p-1.5 hover:p-2 hover:rounded-full transition-all duration-500">
+            <div className="flex items-center justify-center gap-2 rounded-full p-1 overflow-hidden">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                const isCta = item.cta;
+                return (
+                  <Link key={item.href} href={item.href} onClick={(event) => navigate(event, item.href)} className={`flex items-center px-4 py-2 rounded-full transition-all duration-500 hover:scale-105 cursor-pointer group ${isCta ? "bg-[#F44A22] text-white shadow-[0_5px_18px_rgba(244,74,34,.18)] hover:bg-[#161616]" : isActive ? "bg-[#161616] text-white" : "bg-white/10 text-palette-stone hover:bg-[#161616] hover:text-white"}`} style={{ transformOrigin: "center center", transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}>
+                    {item.icon}
+                    <span className="ml-2 text-sm font-medium tracking-wide">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </GlassEffect>
+
+          <div className="relative">
+            <button type="button" onClick={() => setLanguageOpen((open) => !open)} aria-expanded={languageOpen} aria-label={copy.language} className="flex h-[52px] items-center gap-2 rounded-full border border-white/35 bg-white/55 px-4 text-xs font-semibold text-[#161616] shadow-[0_6px_20px_rgba(0,0,0,.12)] backdrop-blur-xl transition hover:bg-white/75">
+              <Languages size={17} />
+              <span>{currentLanguage}</span>
+              <ChevronDown size={14} className={`transition-transform ${languageOpen ? "rotate-180" : ""}`} />
+            </button>
+            {languageOpen && (
+              <div className="absolute right-0 top-[60px] w-52 overflow-hidden rounded-2xl border border-[#161616]/10 bg-white/95 p-2 shadow-2xl backdrop-blur-xl">
+                {localeOptions.map((option) => {
+                  const href = localizedPath(option.code, basePath);
+                  return (
+                    <Link key={option.code} href={href} onClick={(event) => navigate(event, href)} className={`block rounded-xl px-3 py-2.5 text-sm transition ${option.code === locale ? "bg-[#F44A22] text-white" : "hover:bg-[#161616]/5"}`}>
+                      {option.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </GlassEffect>
+        </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setIsOpen((open) => !open)}
-        aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
-        aria-expanded={isOpen}
-        aria-controls="mobile-navigation"
-        className={`fixed right-5 top-5 z-[80] flex h-12 w-12 items-center justify-center rounded-full border border-[#161616]/20 backdrop-blur-xl transition-all duration-300 md:hidden ${isOpen ? "bg-[#161616] text-white" : "bg-white/70 text-[#161616] shadow-[0_8px_30px_rgba(0,0,0,.12)]"}`}
-      >
+      <button type="button" onClick={() => setIsOpen((open) => !open)} aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={isOpen} aria-controls="mobile-navigation" className={`fixed right-5 top-5 z-[80] flex h-12 w-12 items-center justify-center rounded-full border border-[#161616]/20 backdrop-blur-xl transition-all duration-300 md:hidden ${isOpen ? "bg-[#161616] text-white" : "bg-white/70 text-[#161616] shadow-[0_8px_30px_rgba(0,0,0,.12)]"}`}>
         {isOpen ? <X size={21} /> : <Menu size={21} />}
       </button>
 
-      <div
-        id="mobile-navigation"
-        aria-hidden={!isOpen}
-        className={`fixed inset-0 z-[70] overflow-hidden bg-[#E4E2E3]/95 backdrop-blur-2xl transition-all duration-500 md:hidden ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
-      >
+      <div id="mobile-navigation" aria-hidden={!isOpen} className={`fixed inset-0 z-[70] overflow-hidden bg-[#E4E2E3]/95 backdrop-blur-2xl transition-all duration-500 md:hidden ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}>
         <div className="pointer-events-none absolute -left-24 top-28 h-72 w-72 rounded-full bg-[#F44A22]/15 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-[#7B2CBF]/10 blur-3xl" />
 
-        <div className="relative flex h-full flex-col px-6 pb-8 pt-24">
-          <div className="mb-8">
-            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#F44A22]">OÙ EN ÊTES-VOUS ?</div>
-            <p className="mt-2 max-w-xs text-xs leading-5 text-[#161616]/55">Comprendre. Choisir. Vérifier. Puis parler du projet.</p>
+        <div className="relative flex h-full flex-col px-6 pb-7 pt-24" dir={locale === "ar" ? "rtl" : "ltr"}>
+          <div className="mb-5">
+            <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F44A22]">{copy.mobileEyebrow}</div>
+            <p className="mt-2 max-w-xs text-xs leading-5 text-[#161616]/55">{copy.mobileIntro}</p>
           </div>
 
           <nav className="flex flex-1 flex-col justify-center" aria-label="Navigation mobile">
@@ -155,20 +161,12 @@ export default function Navbar() {
               const isActive = pathname === item.href;
               const isCta = item.cta;
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={(event) => navigate(event, item.href)}
-                  tabIndex={isOpen ? 0 : -1}
-                  className={`group flex items-center justify-between border-t border-[#161616]/15 py-5 transition-all duration-300 ${
-                    isCta ? "text-[#F44A22]" : isActive ? "text-[#F44A22]" : "text-[#161616]"
-                  }`}
-                >
+                <Link key={item.href} href={item.href} onClick={(event) => navigate(event, item.href)} tabIndex={isOpen ? 0 : -1} className={`group flex items-center justify-between border-t border-[#161616]/15 py-4 transition-all duration-300 ${isCta || isActive ? "text-[#F44A22]" : "text-[#161616]"}`}>
                   <div className="flex min-w-0 items-start gap-4">
                     <span className="mt-1 text-[10px] font-bold tracking-[0.2em] text-[#161616]/35">0{index + 1}</span>
                     <div className="min-w-0">
-                      <span className={`block font-oswald font-black uppercase leading-none tracking-tight ${isCta ? "text-[10vw]" : "text-[11vw]"}`}>{item.mobileLabel}</span>
-                      <span className={`mt-2 block text-[10px] font-bold uppercase tracking-[0.16em] ${isCta ? "text-[#F44A22]/70" : "text-[#161616]/45"}`}>{item.description}</span>
+                      <span className={`block font-oswald font-black uppercase leading-none tracking-tight ${isCta ? "text-[8.5vw]" : "text-[10vw]"}`}>{item.label}</span>
+                      <span className={`mt-1.5 block text-[9px] font-bold uppercase tracking-[0.12em] ${isCta ? "text-[#F44A22]/70" : "text-[#161616]/45"}`}>{item.description}</span>
                     </div>
                   </div>
                   <span className={`ml-3 text-2xl transition-transform duration-300 group-active:translate-x-1 ${isActive ? "rotate-45" : ""}`}>↗</span>
@@ -178,9 +176,23 @@ export default function Navbar() {
             <div className="border-t border-[#161616]/15" />
           </nav>
 
-          <div className="flex items-center gap-2 pt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-[#161616]/50">
+          <div className="mt-4">
+            <div className="mb-2 flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#161616]/45"><Languages size={14} />{copy.language}</div>
+            <div className="flex flex-wrap gap-2" dir="ltr">
+              {localeOptions.map((option) => {
+                const href = localizedPath(option.code, basePath);
+                return (
+                  <Link key={option.code} href={href} onClick={(event) => navigate(event, href)} tabIndex={isOpen ? 0 : -1} className={`rounded-full border px-3 py-2 text-[10px] font-semibold transition ${option.code === locale ? "border-[#F44A22] bg-[#F44A22] text-white" : "border-[#161616]/15 bg-white/35 text-[#161616]/65"}`}>
+                    {option.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 pt-5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#161616]/50">
             <span className="h-2 w-2 rounded-full bg-[#F44A22]" />
-            Disponible pour de nouveaux projets
+            {copy.available}
           </div>
         </div>
       </div>
