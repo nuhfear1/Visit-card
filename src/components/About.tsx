@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
+import TrustRails from "@/components/TrustRails";
 import { getCopy, localizedPath, type Locale } from "@/lib/i18n";
 import useReducedMotion from "@/hooks/useReducedMotion";
 
@@ -65,6 +66,10 @@ export default function About({ locale = "fr" }: { locale?: Locale }) {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className="mt-8 -mx-6 md:-mx-12 lg:-mx-20">
+          <TrustRails locale={locale} variant="services" />
         </div>
 
         <div className="mt-6 rounded-[2.2rem] border-3 border-[#161616] bg-[#7B2CBF] p-8 md:p-10 text-white flex flex-col md:flex-row md:items-end md:justify-between gap-8">
