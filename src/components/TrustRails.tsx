@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { BadgeCheck, Bot, Boxes, BriefcaseBusiness, ChartNoAxesCombined, Code2 } from "lucide-react";
+import { BadgeCheck, Bot, BriefcaseBusiness, ChartNoAxesCombined, Code2 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 
 type TrustRailsProps = {
