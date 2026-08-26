@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
 import { getCopy, getLocaleFromPathname, localizedPath, localeOptions, stripLocaleFromPathname } from "@/lib/i18n";
 import { getFaqCopy } from "@/lib/faq";
+import { getFaqTerminology } from "@/lib/faq-terminology";
 
 interface GlassEffectProps {
   children: React.ReactNode;
@@ -63,6 +64,7 @@ export default function Navbar() {
   const locale = getLocaleFromPathname(pathname);
   const copy = getCopy(locale).nav;
   const faqCopy = getFaqCopy(locale);
+  const faqTerminology = getFaqTerminology(locale);
   const basePath = stripLocaleFromPathname(pathname);
 
   const usesCompactDesktopNav = ["fr", "en", "es", "pt", "ja"].includes(locale);
@@ -73,7 +75,7 @@ export default function Navbar() {
     { icon: <Home size={18} />, label: copy.home, description: copy.homeDesc, href: localizedPath(locale, "/") },
     { icon: <SlidersHorizontal size={18} />, label: copy.services, description: copy.servicesDesc, href: localizedPath(locale, "/about") },
     { icon: <BadgeCheck size={18} />, label: copy.projects, description: copy.projectsDesc, href: localizedPath(locale, "/projects") },
-    { icon: <CircleHelp size={18} />, label: faqCopy.navLabel, description: faqCopy.navDesc, href: localizedPath(locale, "/faq") },
+    { icon: <CircleHelp size={18} />, label: faqTerminology.navLabel, description: faqCopy.navDesc, href: localizedPath(locale, "/faq") },
     { icon: <MessageCircle size={18} />, label: copy.contact, description: copy.contactDesc, href: localizedPath(locale, "/contact"), cta: true },
   ];
 
