@@ -57,6 +57,20 @@ const projects = [
       ["RÉSULTAT", "Une base clients structurée, segmentable et prête pour des campagnes WhatsApp ou email plus ciblées."],
     ],
   },
+  {
+    num: "05",
+    title: "AGENCE DE MARKETING DIGITAL",
+    tags: "SEA · SOCIAL ADS · PERFORMANCE",
+    primary: "#12B886",
+    secondary: "#0B7285",
+    facts: [
+      ["QUOI", "Pilotage et optimisation de campagnes d’acquisition digitale sur un portefeuille multilingue."],
+      ["POUR QUI", "Yateo, agence partenaire en croissance digitale."],
+      ["POURQUOI", "Améliorer la performance des campagnes et piloter les investissements à partir des bons indicateurs."],
+      ["COMMENT", "SEA et Social Ads, A/B tests, gestion des CPC et budgets, Quality Score, tracking, analyse des recherches et reporting."],
+      ["RÉSULTAT", "Une expérience menée sur plus de 100 comptes multilingues, avec suivi des ROI, CA et CPA."],
+    ],
+  },
 ];
 
 export default function ImageMaskGrid() {
@@ -69,11 +83,9 @@ export default function ImageMaskGrid() {
             className={`group relative min-h-[520px] overflow-hidden border-2 border-[#161616] bg-[#161616] ${
               index === 0
                 ? "lg:col-span-2 rounded-tl-[5rem] rounded-br-[2rem]"
-                : index === 3
-                  ? "lg:col-span-2 rounded-tr-[5rem] rounded-bl-[2rem]"
-                  : index % 2 === 0
-                    ? "rounded-tl-[5rem] rounded-br-[2rem]"
-                    : "rounded-tr-[5rem] rounded-bl-[2rem]"
+                : index % 2 === 0
+                  ? "rounded-tl-[5rem] rounded-br-[2rem]"
+                  : "rounded-tr-[5rem] rounded-bl-[2rem]"
             }`}
           >
             <div className="absolute -left-[20%] -top-[15%] h-[75%] w-[90%] rounded-full blur-[55px] transition-transform duration-700 group-hover:scale-110" style={{ backgroundColor: project.primary }} />
