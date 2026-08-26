@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { usePageTransition } from "@/components/PageTransition";
 import { getCopy, localizedPath, type Locale } from "@/lib/i18n";
+import useReducedMotion from "@/hooks/useReducedMotion";
 
 export default function Hero({ locale = "fr" }: { locale?: Locale }) {
   const containerRef = useRef<HTMLElement>(null);
@@ -12,6 +13,7 @@ export default function Hero({ locale = "fr" }: { locale?: Locale }) {
   const logoRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const { startTransition } = usePageTransition();
+  const reducedMotion = useReducedMotion();
   const copy = getCopy(locale).hero;
   const phrases = useMemo(() => copy.phrases, [copy.phrases]);
 
@@ -21,11 +23,16 @@ export default function Hero({ locale = "fr" }: { locale?: Locale }) {
 
   useEffect(() => {
     setPhraseIndex(0);
-    setDisplayText("");
+    setDisplayText(reducedMotion ? phrases[0] || "" : "");
     setDeleting(false);
-  }, [locale]);
+  }, [locale, reducedMotion, phrases]);
 
   useEffect(() => {
+    if (reducedMotion) {
+      setDisplayText(phrases[0] || "");
+      return;
+    }
+
     const current = phrases[phraseIndex] || phrases[0];
     const speed = deleting ? 35 : 70;
     const timer = window.setTimeout(() => {
@@ -43,13 +50,14 @@ export default function Hero({ locale = "fr" }: { locale?: Locale }) {
       }
     }, speed);
     return () => window.clearTimeout(timer);
-  }, [displayText, deleting, phraseIndex, phrases]);
+  }, [displayText, deleting, phraseIndex, phrases, reducedMotion]);
 
   useGSAP(() => {
+    if (reducedMotion) return;
     const tl = gsap.timeline({ delay: 0.15 });
     tl.from(logoRef.current, { opacity: 0, y: -20, duration: 0.8, ease: "power3.out" })
       .from(contentRef.current, { opacity: 0, scale: 0.98, duration: 1, ease: "power3.out" }, "-=0.35");
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [reducedMotion] });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -81,6 +89,7 @@ export default function Hero({ locale = "fr" }: { locale?: Locale }) {
     };
 
     const warp = (x: number, y: number) => {
+      if (reducedMotion) return { x, y };
       const dx = x - mouseX;
       const dy = y - mouseY;
       const distance = Math.hypot(dx, dy);
@@ -117,25 +126,38 @@ export default function Hero({ locale = "fr" }: { locale?: Locale }) {
       for (let i = 0; i <= 6; i++) line(cx, cy, width, (height / 6) * i);
       ctx.stroke();
 
-      const glow = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 190);
-      glow.addColorStop(0, "rgba(244,74,34,.13)");
-      glow.addColorStop(1, "rgba(244,74,34,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, width, height);
-      raf = requestAnimationFrame(draw);
+      if (!reducedMotion) {
+        const glow = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 190);
+        glow.addColorStop(0, "rgba(244,74,34,.13)");
+        glow.addColorStop(1, "rgba(244,74,34,0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, width, height);
+      }
+    };
+
+    const loop = () => {
+      draw();
+      raf = requestAnimationFrame(loop);
     };
 
     resize();
-    window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", move);
-    draw();
+    window.addEventListener("resize", () => {
+      resize();
+      if (reducedMotion) draw();
+    });
+
+    if (reducedMotion) {
+      draw();
+    } else {
+      window.addEventListener("mousemove", move);
+      loop();
+    }
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", move);
     };
-  }, []);
+  }, [reducedMotion]);
 
   const isRtl = locale === "ar";
 
@@ -162,7 +184,7 @@ export default function Hero({ locale = "fr" }: { locale?: Locale }) {
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center -translate-y-8 select-none">
           <div className="font-oswald text-[7.5vw] font-black uppercase leading-[0.82] tracking-tighter text-[#161616]/10 text-center px-4">{copy.lead}</div>
           <div className="mt-4 min-h-[1.2em] px-5 text-center font-oswald text-[5.6vw] md:text-[6.5vw] font-black uppercase leading-[0.9] tracking-tighter text-stroke-orange">
-            {displayText}<span className="animate-pulse">|</span>
+            {displayText}{!reducedMotion && <span className="animate-pulse">|</span>}
           </div>
         </div>
 
