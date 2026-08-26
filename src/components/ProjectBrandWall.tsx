@@ -101,11 +101,11 @@ const companyItems: CompanyItem[] = [
     wordmark: true,
   },
   {
-    name: "Egila",
-    meta: "Real estate",
-    logo: "/Visit-card/egila-logo.png",
+    name: "BNP Paribas",
+    meta: "Finance",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/8/85/BNP_Paribas_logo.svg",
     surface: "bg-white",
-    imageClass: "max-h-36 max-w-[72%]",
+    imageClass: "max-h-20 max-w-[72%]",
   },
   {
     name: "Dayloom",
