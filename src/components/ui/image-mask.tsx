@@ -17,7 +17,7 @@ const projects = [
   },
   {
     num: "02",
-    title: "PSG ACADEMY",
+    title: "CLUB DE FOOTBALL",
     tags: "MARKETING · COMMUNICATION · DÉVELOPPEMENT",
     primary: "#00F2FE",
     secondary: "#4FACFE",
@@ -45,7 +45,7 @@ const projects = [
   },
   {
     num: "04",
-    title: "PROMOCASH",
+    title: "GRANDE DISTRIBUTION",
     tags: "DATA · AUTOMATISATION · SEGMENTATION",
     primary: "#FFAD29",
     secondary: "#F44A22",
