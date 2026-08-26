@@ -14,7 +14,7 @@ type ContactLink = {
 };
 
 const links: ContactLink[] = [
-  { label: "EMAIL", value: "À CONFIGURER", mark: "@", icon: Mail },
+  { label: "EMAIL", value: "garywilfredborilla@gmail.com", mark: "@", icon: Mail, href: "mailto:garywilfredborilla@gmail.com" },
   { label: "TÉLÉPHONE", value: "+590 690 09 63 77", mark: "TEL", icon: Phone, href: "tel:+590690096377" },
   { label: "WHATSAPP", value: "+590 690 09 63 77", mark: "WA", icon: MessageCircle, href: "https://wa.me/590690096377" },
 ];
@@ -63,7 +63,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#161616]/45">{label}</div>
-                  <div className="mt-2 font-oswald text-xl font-bold uppercase tracking-wide">{value}</div>
+                  <div className="mt-2 break-words font-oswald text-xl font-bold tracking-wide">{value}</div>
                 </div>
               </>
             );
