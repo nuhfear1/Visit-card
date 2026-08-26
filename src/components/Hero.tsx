@@ -175,7 +175,7 @@ export default function Hero() {
         <div className="pointer-events-auto absolute bottom-24 left-8 z-30 hidden w-64 flex-col gap-4 lg:flex">
           {[
             ["8+", "ANNÉES D’EXPÉRIENCE"],
-            ["128", "PROJETS LIVRÉS"],
+            ["150+", "PROJETS & MISSIONS"],
             ["96 %", "SATISFACTION CLIENT"],
             ["21 JOURS", "DÉLAI MOYEN DE LIVRAISON"],
           ].map(([title, label]) => (
