@@ -1,6 +1,5 @@
 import {
   copyByLocale as baseCopyByLocale,
-  getCopy as getBaseCopy,
   type Locale as BaseLocale,
   type SiteCopy,
 } from "@/lib/i18n-base";
@@ -49,5 +48,4 @@ export const copyByLocale: Record<Locale, SiteCopy> = sanitizeTextContent({
   gcf: gcfCopy,
 });
 
-export const getCopy = (locale: Locale = "fr") =>
-  sanitizeTextContent(locale === "gcf" ? gcfCopy : getBaseCopy(locale as BaseLocale));
+export const getCopy = (locale: Locale = "fr") => copyByLocale[locale];
