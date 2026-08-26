@@ -27,7 +27,7 @@ export default function Contact() {
   useGSAP(() => {
     const tl = gsap.timeline({ delay: 0.15 });
     tl.from(titleRef.current, { y: 35, opacity: 0, duration: 0.9, ease: "power3.out" })
-      .from(cardsRef.current?.children || [], { y: 24, opacity: 0, duration: 0.7, stagger: 0.08, ease: "power3.out" }, "-=0.45");
+      .from(cardsRef.current, { y: 24, opacity: 0, duration: 0.7, ease: "power3.out", clearProps: "transform,opacity" }, "-=0.45");
   }, { scope: containerRef });
 
   return (
@@ -47,7 +47,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div ref={cardsRef} className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div ref={cardsRef} className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
           {links.map(({ label, value, mark, icon: Icon, href }) => {
             const body = (
               <>
