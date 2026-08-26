@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Home, SlidersHorizontal, BadgeCheck, MessageCircle, Menu, X, Languages, ChevronDown } from "lucide-react";
+import { Home, SlidersHorizontal, BadgeCheck, CircleHelp, MessageCircle, Menu, X, Languages, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
 import { getCopy, getLocaleFromPathname, localizedPath, localeOptions, stripLocaleFromPathname } from "@/lib/i18n";
+import { getFaqCopy } from "@/lib/faq";
 
 interface GlassEffectProps {
   children: React.ReactNode;
@@ -61,12 +62,14 @@ export default function Navbar() {
   const languageRef = useRef<HTMLDivElement>(null);
   const locale = getLocaleFromPathname(pathname);
   const copy = getCopy(locale).nav;
+  const faqCopy = getFaqCopy(locale);
   const basePath = stripLocaleFromPathname(pathname);
 
   const navItems = [
     { icon: <Home size={18} />, label: copy.home, description: copy.homeDesc, href: localizedPath(locale, "/") },
     { icon: <SlidersHorizontal size={18} />, label: copy.services, description: copy.servicesDesc, href: localizedPath(locale, "/about") },
     { icon: <BadgeCheck size={18} />, label: copy.projects, description: copy.projectsDesc, href: localizedPath(locale, "/projects") },
+    { icon: <CircleHelp size={18} />, label: faqCopy.navLabel, description: faqCopy.navDesc, href: localizedPath(locale, "/faq") },
     { icon: <MessageCircle size={18} />, label: copy.contact, description: copy.contactDesc, href: localizedPath(locale, "/contact"), cta: true },
   ];
 
