@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Home, User, Briefcase, Mail, Menu, X } from "lucide-react";
+import { Home, SlidersHorizontal, BadgeCheck, MessageCircle, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
@@ -58,10 +58,10 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { icon: <Home size={18} />, label: "Accueil", href: "/" },
-    { icon: <User size={18} />, label: "Services", href: "/about" },
-    { icon: <Briefcase size={18} />, label: "Projets", href: "/projects" },
-    { icon: <Mail size={18} />, label: "Contact", href: "/contact" },
+    { icon: <Home size={18} />, label: "Accueil", mobileLabel: "Accueil", description: "Partir du problème", href: "/" },
+    { icon: <SlidersHorizontal size={18} />, label: "Services", mobileLabel: "Services", description: "Choisir le bon levier", href: "/about" },
+    { icon: <BadgeCheck size={18} />, label: "Projets", mobileLabel: "Projets", description: "Voir les preuves", href: "/projects" },
+    { icon: <MessageCircle size={18} />, label: "Parler du projet", mobileLabel: "Parler du projet", description: "Me dire ce qui bloque", href: "/contact", cta: true },
   ];
 
   useEffect(() => {
@@ -99,14 +99,21 @@ export default function Navbar() {
       <div className="fixed top-6 left-1/2 z-50 hidden -translate-x-1/2 md:block">
         <GlassEffect className="rounded-full p-1.5 hover:p-2 hover:rounded-full transition-all duration-500">
           <div className="flex items-center justify-center gap-2 rounded-full p-1 overflow-hidden">
-            {navItems.map((item, index) => {
+            {navItems.map((item) => {
               const isActive = pathname === item.href;
+              const isCta = item.cta;
               return (
                 <Link
-                  key={index}
+                  key={item.href}
                   href={item.href}
                   onClick={(event) => navigate(event, item.href)}
-                  className={`flex items-center px-4 py-2 rounded-full transition-all duration-500 hover:scale-105 cursor-pointer group ${isActive ? "bg-[#F44A22] text-white" : "bg-white/10 text-palette-stone hover:bg-[#F44A22] hover:text-white"}`}
+                  className={`flex items-center px-4 py-2 rounded-full transition-all duration-500 hover:scale-105 cursor-pointer group ${
+                    isCta
+                      ? "bg-[#F44A22] text-white shadow-[0_5px_18px_rgba(244,74,34,.18)] hover:bg-[#161616]"
+                      : isActive
+                        ? "bg-[#161616] text-white"
+                        : "bg-white/10 text-palette-stone hover:bg-[#161616] hover:text-white"
+                  }`}
                   style={{ transformOrigin: "center center", transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}
                 >
                   {item.icon}
@@ -138,24 +145,33 @@ export default function Navbar() {
         <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-[#7B2CBF]/10 blur-3xl" />
 
         <div className="relative flex h-full flex-col px-6 pb-8 pt-24">
-          <div className="mb-10 text-[10px] font-bold uppercase tracking-[0.3em] text-[#161616]/45">Navigation</div>
+          <div className="mb-8">
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#F44A22]">OÙ EN ÊTES-VOUS ?</div>
+            <p className="mt-2 max-w-xs text-xs leading-5 text-[#161616]/55">Comprendre. Choisir. Vérifier. Puis parler du projet.</p>
+          </div>
 
           <nav className="flex flex-1 flex-col justify-center" aria-label="Navigation mobile">
             {navItems.map((item, index) => {
               const isActive = pathname === item.href;
+              const isCta = item.cta;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={(event) => navigate(event, item.href)}
                   tabIndex={isOpen ? 0 : -1}
-                  className={`group flex items-center justify-between border-t border-[#161616]/15 py-5 transition-all duration-300 ${isActive ? "text-[#F44A22]" : "text-[#161616]"}`}
+                  className={`group flex items-center justify-between border-t border-[#161616]/15 py-5 transition-all duration-300 ${
+                    isCta ? "text-[#F44A22]" : isActive ? "text-[#F44A22]" : "text-[#161616]"
+                  }`}
                 >
-                  <div className="flex items-baseline gap-4">
-                    <span className="text-[10px] font-bold tracking-[0.2em] text-[#161616]/35">0{index + 1}</span>
-                    <span className="font-oswald text-[12vw] font-black uppercase leading-none tracking-tight">{item.label}</span>
+                  <div className="flex min-w-0 items-start gap-4">
+                    <span className="mt-1 text-[10px] font-bold tracking-[0.2em] text-[#161616]/35">0{index + 1}</span>
+                    <div className="min-w-0">
+                      <span className={`block font-oswald font-black uppercase leading-none tracking-tight ${isCta ? "text-[10vw]" : "text-[11vw]"}`}>{item.mobileLabel}</span>
+                      <span className={`mt-2 block text-[10px] font-bold uppercase tracking-[0.16em] ${isCta ? "text-[#F44A22]/70" : "text-[#161616]/45"}`}>{item.description}</span>
+                    </div>
                   </div>
-                  <span className={`text-2xl transition-transform duration-300 group-active:translate-x-1 ${isActive ? "rotate-45" : ""}`}>↗</span>
+                  <span className={`ml-3 text-2xl transition-transform duration-300 group-active:translate-x-1 ${isActive ? "rotate-45" : ""}`}>↗</span>
                 </Link>
               );
             })}
