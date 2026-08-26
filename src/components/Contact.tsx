@@ -15,8 +15,8 @@ type ContactLink = {
 
 const links: ContactLink[] = [
   { label: "EMAIL", value: "À CONFIGURER", mark: "@", icon: Mail },
-  { label: "TÉLÉPHONE", value: "À CONFIGURER", mark: "TEL", icon: Phone },
-  { label: "WHATSAPP", value: "À CONFIGURER", mark: "WA", icon: MessageCircle },
+  { label: "TÉLÉPHONE", value: "+590 690 09 63 77", mark: "TEL", icon: Phone, href: "tel:+590690096377" },
+  { label: "WHATSAPP", value: "+590 690 09 63 77", mark: "WA", icon: MessageCircle, href: "https://wa.me/590690096377" },
 ];
 
 export default function Contact() {
@@ -69,7 +69,13 @@ export default function Contact() {
             );
 
             return href ? (
-              <a key={label} href={href} target="_blank" rel="noreferrer" className="group flex min-h-52 flex-col justify-between rounded-[2rem] border-2 border-[#161616] bg-white/55 p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-[#F44A22] hover:text-white">
+              <a
+                key={label}
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noreferrer" : undefined}
+                className="group flex min-h-52 flex-col justify-between rounded-[2rem] border-2 border-[#161616] bg-white/55 p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-[#F44A22] hover:text-white"
+              >
                 {body}
               </a>
             ) : (
