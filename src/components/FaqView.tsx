@@ -3,11 +3,15 @@
 import Link from "next/link";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { getFaqCopy } from "@/lib/faq";
+import { getFaqTerminology } from "@/lib/faq-terminology";
 import { localizedPath, type Locale } from "@/lib/i18n";
 
 export default function FaqView({ locale = "fr" }: { locale?: Locale }) {
   const copy = getFaqCopy(locale);
+  const terminology = getFaqTerminology(locale);
   let count = 0;
+  const eyebrowSuffix = copy.eyebrow.includes("/") ? copy.eyebrow.split("/").slice(1).join("/").trim() : copy.eyebrow;
+  const localizedEyebrow = `${terminology.pageLabel} / ${eyebrowSuffix}`;
 
   return (
     <main className="min-h-screen bg-[#E4E2E3] text-[#161616]">
@@ -16,7 +20,7 @@ export default function FaqView({ locale = "fr" }: { locale?: Locale }) {
         <div className="mx-auto max-w-[1500px]">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,.75fr)] lg:items-end lg:gap-16">
             <div>
-              <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.24em] text-[#F44A22] sm:text-xs">{copy.eyebrow}</p>
+              <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.24em] text-[#F44A22] sm:text-xs">{localizedEyebrow}</p>
               <h1 className="max-w-6xl font-oswald text-[15vw] font-black uppercase leading-[.82] tracking-[-0.055em] sm:text-[11vw] lg:text-[7.4vw] xl:text-[6.7vw]">
                 <span className="block">{copy.headline[0]}</span>
                 <span className="block text-[#F44A22]">{copy.headline[1]}</span>

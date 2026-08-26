@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { allLocales, getCopy, localizedPath, type Locale } from "@/lib/i18n";
 import { getFaqCopy } from "@/lib/faq";
+import { getFaqTerminology } from "@/lib/faq-terminology";
 
 const SITE_URL = "https://nuhfear1.github.io/Visit-card";
 const SOCIAL_IMAGE = `${SITE_URL}/gary-services.webp`;
@@ -32,6 +33,7 @@ export type SeoPage = "home" | "services" | "projects" | "faq" | "contact";
 export function createPageMetadata(locale: Locale, page: SeoPage, path: string): Metadata {
   const copy = getCopy(locale);
   const faqCopy = getFaqCopy(locale);
+  const faqTerminology = getFaqTerminology(locale);
   const pageTitle = page === "home"
     ? copy.hero.lead.replace(/\.$/, "")
     : page === "services"
@@ -39,7 +41,7 @@ export function createPageMetadata(locale: Locale, page: SeoPage, path: string):
       : page === "projects"
         ? copy.projectsPage.eyebrow.split("/")[0].trim()
         : page === "faq"
-          ? faqCopy.seoTitle
+          ? faqTerminology.seoTitle
           : copy.contactPage.eyebrow.split("/")[0].trim();
 
   const description = page === "home"
