@@ -71,6 +71,20 @@ const projects = [
       ["RÉSULTAT", "Une expérience menée sur plus de 100 comptes multilingues, avec suivi des ROI, CA et CPA."],
     ],
   },
+  {
+    num: "06",
+    title: "AGENTS & MODÈLES IA",
+    tags: "IA · AUTOMATISATION · OPÉRATIONS",
+    primary: "#2563EB",
+    secondary: "#A3E635",
+    facts: [
+      ["QUOI", "Conception de systèmes capables de prendre en charge les messages clients, les relances et les tâches répétitives."],
+      ["POUR QUI", "Dayloom."],
+      ["POURQUOI", "Réduire la charge opérationnelle, accélérer les réponses et éviter que des opportunités se perdent par oubli ou manque de suivi."],
+      ["COMMENT", "Agents et automatisations connectés aux outils existants : WhatsApp, Instagram, email, Shopify, Klaviyo, Brevo, n8n et WooCommerce."],
+      ["RÉSULTAT", "94 % des messages traités sans intervention et plus de 12 000 conversations prises en charge chaque mois."],
+    ],
+  },
 ];
 
 export default function ImageMaskGrid() {
@@ -83,9 +97,11 @@ export default function ImageMaskGrid() {
             className={`group relative min-h-[520px] overflow-hidden border-2 border-[#161616] bg-[#161616] ${
               index === 0
                 ? "lg:col-span-2 rounded-tl-[5rem] rounded-br-[2rem]"
-                : index % 2 === 0
-                  ? "rounded-tl-[5rem] rounded-br-[2rem]"
-                  : "rounded-tr-[5rem] rounded-bl-[2rem]"
+                : index === 5
+                  ? "lg:col-span-2 rounded-tr-[5rem] rounded-bl-[2rem]"
+                  : index % 2 === 0
+                    ? "rounded-tl-[5rem] rounded-br-[2rem]"
+                    : "rounded-tr-[5rem] rounded-bl-[2rem]"
             }`}
           >
             <div className="absolute -left-[20%] -top-[15%] h-[75%] w-[90%] rounded-full blur-[55px] transition-transform duration-700 group-hover:scale-110" style={{ backgroundColor: project.primary }} />
