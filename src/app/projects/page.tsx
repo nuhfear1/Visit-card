@@ -7,13 +7,13 @@ import ImageMaskGrid from "@/components/ui/image-mask";
 
 export default function ProjectsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     const tl = gsap.timeline({ delay: 0.2 });
 
-    tl.from(logoRef.current, {
+    tl.from(titleRef.current, {
       y: -20,
       opacity: 0,
       duration: 0.8,
@@ -31,17 +31,17 @@ export default function ProjectsPage() {
   return (
     <main
       ref={containerRef}
-      className="relative w-full min-h-screen bg-palette-grey text-palette-midnight flex flex-col justify-center items-center py-24 px-0 overflow-hidden"
+      className="relative min-h-screen w-full overflow-hidden bg-palette-grey px-0 pb-16 pt-28 text-palette-midnight md:pb-20 md:pt-32"
     >
       <div
-        ref={logoRef}
-        className="absolute top-6 left-8 z-20 text-[#F44A22] text-4xl tracking-widest pointer-events-none drop-shadow-md origin-center"
+        ref={titleRef}
+        className="pointer-events-none absolute left-6 top-6 z-20 text-3xl tracking-widest text-[#F44A22] drop-shadow-md md:left-8 md:text-4xl"
         style={{ fontFamily: "'Oswald', sans-serif" }}
       >
-        EXPERTISE
+        PROJETS
       </div>
 
-      <div ref={gridRef} className="w-full max-w-full z-10">
+      <div ref={gridRef} className="relative z-10 w-full max-w-full">
         <ImageMaskGrid />
       </div>
     </main>
