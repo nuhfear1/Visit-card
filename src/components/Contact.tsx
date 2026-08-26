@@ -3,9 +3,17 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ArrowUpRight, Mail, Phone, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Mail, Phone, MessageCircle, type LucideIcon } from "lucide-react";
 
-const links = [
+type ContactLink = {
+  label: string;
+  value: string;
+  mark: string;
+  icon: LucideIcon;
+  href?: string;
+};
+
+const links: ContactLink[] = [
   { label: "EMAIL", value: "À CONFIGURER", mark: "@", icon: Mail },
   { label: "TÉLÉPHONE", value: "À CONFIGURER", mark: "TEL", icon: Phone },
   { label: "WHATSAPP", value: "À CONFIGURER", mark: "WA", icon: MessageCircle },
