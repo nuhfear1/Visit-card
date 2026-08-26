@@ -83,6 +83,30 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-marquee,
+  .animate-float-fast-top,
+  .animate-float-medium-mid,
+  .animate-float-medium-mid-delayed,
+  .animate-float-slow-bottom,
+  .animate-pulse {
+    animation: none !important;
+  }
+}
+
 html, body, .cursor-default {
   cursor: url('/Visit-card/cursor.svg') 3 3, auto;
 }
