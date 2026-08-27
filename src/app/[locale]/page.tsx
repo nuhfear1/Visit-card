@@ -1,4 +1,4 @@
-import HomeV21 from "@/components/HomeV21";
+import HomeAllInOne from "@/components/HomeAllInOne";
 import { localizedLocales, type Locale } from "@/lib/i18n";
 import { createPageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
@@ -17,7 +17,7 @@ export default function LocalizedHome({ params }: { params: { locale: string } }
   const locale = params.locale as Locale;
   return (
     <main className="relative min-h-screen bg-[#0a0a0a]">
-      <HomeV21 locale={locale} />
+      <HomeAllInOne locale={locale} />
     </main>
   );
 }
