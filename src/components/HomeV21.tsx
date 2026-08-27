@@ -169,8 +169,13 @@ export default function HomeV21({ locale = "fr" }: { locale?: Locale }) {
     const onScroll = () => {
       if (statementRef.current) {
         const rect = statementRef.current.getBoundingClientRect();
-        const p = Math.min(1, Math.max(0, 1 - rect.top / window.innerHeight));
-        statementRef.current.style.setProperty("--scene-progress", String(p));
+        const travel = Math.max(1, rect.height - window.innerHeight);
+        const raw = Math.min(1, Math.max(0, -rect.top / travel));
+        const focus = Math.min(1, raw / 0.65);
+        const offset = (1 - focus) * 7;
+        statementRef.current.style.setProperty("--scene-progress", String(focus));
+        statementRef.current.style.setProperty("--scene-left", `${-offset}vw`);
+        statementRef.current.style.setProperty("--scene-right", `${offset}vw`);
       }
       if (problemRef.current) {
         const rect = problemRef.current.getBoundingClientRect();
@@ -181,7 +186,11 @@ export default function HomeV21({ locale = "fr" }: { locale?: Locale }) {
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, [c.problems.length]);
 
   const nav = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -193,17 +202,19 @@ export default function HomeV21({ locale = "fr" }: { locale?: Locale }) {
     <>
       <Hero locale={locale} />
 
-      <section ref={statementRef} dir={isRtl ? "rtl" : "ltr"} className="relative min-h-[105vh] overflow-hidden bg-[#E4E2E3] text-[#161616] [--scene-progress:0]">
-        <div className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: "linear-gradient(rgba(22,22,22,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(22,22,22,.08) 1px, transparent 1px)", backgroundSize: "56px 56px", transform: "perspective(900px) rotateX(63deg) scale(1.8) translateY(18%)", transformOrigin: "50% 100%" }} />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[38vw] w-[38vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F44A22]/10 blur-3xl" />
-        <div className="relative z-10 mx-auto flex min-h-[105vh] max-w-[1500px] flex-col justify-center px-5 py-24 md:px-10 lg:px-16">
-          <div className="overflow-hidden">
-            <div className="font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] transition-transform duration-75 md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(calc((var(--scene-progress) - .5) * -3vw))" }}>{c.statement[0]}</div>
+      <section ref={statementRef} dir={isRtl ? "rtl" : "ltr"} className="relative h-[165vh] bg-[#E4E2E3] text-[#161616]">
+        <div className="sticky top-0 h-screen overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: "linear-gradient(rgba(22,22,22,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(22,22,22,.08) 1px, transparent 1px)", backgroundSize: "56px 56px", transform: "perspective(900px) rotateX(63deg) scale(1.8) translateY(18%)", transformOrigin: "50% 100%" }} />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[38vw] w-[38vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F44A22]/10 blur-3xl" />
+          <div className="relative z-10 mx-auto flex h-screen max-w-[1500px] flex-col justify-center px-5 py-24 md:px-10 lg:px-16">
+            <div className="w-full overflow-hidden">
+              <div className="w-full text-center font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] will-change-transform md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(var(--scene-left, -7vw))" }}>{c.statement[0]}</div>
+            </div>
+            <div className="mt-3 w-full overflow-hidden md:mt-5">
+              <div className="w-full text-center font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] text-[#F44A22] will-change-transform md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(var(--scene-right, 7vw))" }}>{c.statement[1]}</div>
+            </div>
+            <div className="mt-10 h-px w-full origin-left bg-[#161616]/20" style={{ transform: "scaleX(calc(.2 + var(--scene-progress, 0) * .8))" }} />
           </div>
-          <div className="mt-3 overflow-hidden md:mt-5">
-            <div className="font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] text-[#F44A22] transition-transform duration-75 md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(calc((var(--scene-progress) - .5) * 3vw))" }}>{c.statement[1]}</div>
-          </div>
-          <div className="mt-10 h-px w-full origin-left bg-[#161616]/20" style={{ transform: "scaleX(calc(.2 + var(--scene-progress) * .8))" }} />
         </div>
       </section>
 
