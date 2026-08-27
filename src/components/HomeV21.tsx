@@ -198,10 +198,10 @@ export default function HomeV21({ locale = "fr" }: { locale?: Locale }) {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[38vw] w-[38vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F44A22]/10 blur-3xl" />
         <div className="relative z-10 mx-auto flex min-h-[105vh] max-w-[1500px] flex-col justify-center px-5 py-24 md:px-10 lg:px-16">
           <div className="overflow-hidden">
-            <div className="font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] transition-transform duration-75 md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(calc((var(--scene-progress) - .35) * -9vw))" }}>{c.statement[0]}</div>
+            <div className="font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] transition-transform duration-75 md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(calc((var(--scene-progress) - .5) * -3vw))" }}>{c.statement[0]}</div>
           </div>
           <div className="mt-3 overflow-hidden md:mt-5">
-            <div className="font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] text-[#F44A22] transition-transform duration-75 md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(calc((var(--scene-progress) - .35) * 10vw))" }}>{c.statement[1]}</div>
+            <div className="font-oswald text-[13.4vw] font-black uppercase leading-[0.78] tracking-[-0.06em] text-[#F44A22] transition-transform duration-75 md:text-[9.2vw] lg:text-[7.2vw]" style={{ transform: "translateX(calc((var(--scene-progress) - .5) * 3vw))" }}>{c.statement[1]}</div>
           </div>
           <div className="mt-10 h-px w-full origin-left bg-[#161616]/20" style={{ transform: "scaleX(calc(.2 + var(--scene-progress) * .8))" }} />
         </div>
