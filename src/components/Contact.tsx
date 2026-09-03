@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import { ArrowUpRight, Mail, Phone, MessageCircle, type LucideIcon } from "lucide-react";
 import { getCopy, type Locale } from "@/lib/i18n";
 import useReducedMotion from "@/hooks/useReducedMotion";
+import ProjectConversationForm from "@/components/ProjectConversationForm";
 
 type ContactLink = {
   label: string;
@@ -76,6 +77,8 @@ export default function Contact({ locale = "fr" }: { locale?: Locale }) {
           })}
         </div>
       </div>
+
+      <ProjectConversationForm locale={locale} />
 
       <div className="mx-auto mt-14 flex max-w-7xl items-center justify-between border-t border-[#161616]/20 pt-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#161616]/50">
         <span>Gary WILFRED-BORILLA</span>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { PageTransitionProvider } from "@/components/PageTransition";
+import FunnelContextCapture from "@/components/FunnelContextCapture";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nuhfear1.github.io/Visit-card/"),
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className="antialiased">
         <PageTransitionProvider>
+          <FunnelContextCapture />
           {children}
           <Navbar />
         </PageTransitionProvider>
