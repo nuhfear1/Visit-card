@@ -4,9 +4,10 @@ This directory contains the importable n8n implementation of the Gary Wilfred-Bo
 
 ## Deliverables
 
-- `gary-launch.bundle.json`: all 22 workflows for CLI import.
-- `workflows/*.json`: one workflow per file for UI import and review.
-- `manifest.json`: exact import order, stable IDs, webhook inventory and credential names.
+- `gary-launch.n8np`: official multi-workflow package for the current n8n API CLI (Preview).
+- `gary-launch-individual-workflows.zip`: the 22 standalone JSON files, ready to extract.
+- `workflows/*.json`: one valid workflow object per file for editor UI import and review.
+- `import-order.json`: exact individual import order, stable IDs, webhook inventory and credential names.
 - `config/gary-launch.config.example.json`: non-secret integration and campaign configuration.
 - `credentials.example.json`: credential inventory without values.
 - `fixtures/*.json`: safe requests for validation and duplicate testing.
@@ -63,15 +64,27 @@ Before activation:
 - ensure the Postgres role can create the `gwb_launch` schema;
 - configure every server-to-server callback to send the internal header, or replace that boundary with the selected provider's signed-webhook verification.
 
-## 3. Import in dependency order
+## 3. Import without the old array bundle
 
-For n8n CLI, import the bundle:
+The former `gary-launch.bundle.json` was a JSON array. The n8n editor's **Import from File** action expects one workflow object and rejects that shape. It has been removed so it cannot be confused with an importable workflow again.
+
+### Most compatible: editor UI
+
+Extract `gary-launch-individual-workflows.zip`, then use **Import from File** on each JSON in the numbered order. The same order is recorded in `import-order.json`.
+
+Every file under `workflows/` has a JSON object at its root, never an array. If the target n8n instance replaces any stable workflow ID, reselect the referenced sub-workflow in each `Execute Workflow` node.
+
+### Grouped import: current n8n package API
+
+`gary-launch.n8np` uses n8n's official package format version 1. Packages are a Preview feature imported through the public API CLI, not through the workflow editor's JSON import button:
 
 ```bash
-n8n import:workflow --input=n8n/gary-launch.bundle.json
+npx @n8n/cli package import \
+  --file=n8n/gary-launch.n8np \
+  --workflow-conflict-policy=fail
 ```
 
-For the editor UI, import the files in the order listed by `manifest.json`. If the target n8n instance replaces any stable workflow ID, reselect the referenced sub-workflow in each `Execute Workflow` node.
+This command requires the CLI to be connected to the target n8n instance with an API key. Because the workflows reference six credentials whose secrets are deliberately absent, map the credential requirements to credentials created on the target instance during package import. If the installed n8n version has no `package import` command, use the individual JSON route above.
 
 Run `GWB | W99 | One-time Ledger Setup` manually once. Do not activate it.
 
@@ -120,7 +133,7 @@ Required acceptance tests:
 7. W11 stores drafts but publishes nothing.
 8. W14 reconciles registration, attendance, booking, opportunity, sale and revenue.
 
-The structural validator checks JSON parsing, code-node syntax, graph reachability, stable sub-workflow references, webhook uniqueness, inactive imports and accidental secret patterns. It does not replace an import and end-to-end run against the chosen n8n version and real provider sandboxes.
+The structural validators check JSON parsing, code-node syntax, graph reachability, stable sub-workflow references, webhook uniqueness, inactive imports, accidental secret patterns, the `.n8np` archive order and its package manifest. They do not replace an end-to-end run against the chosen n8n version and real provider sandboxes.
 
 ## 6. Connect Visit-card
 
