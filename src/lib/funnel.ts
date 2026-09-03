@@ -1,5 +1,12 @@
 import type { Locale } from "@/lib/i18n";
-import { isPublicApiConfigured, postPublicApi, PUBLIC_API_ROUTES } from "@/lib/public-api";
+import {
+  isN8nProjectConversationConfigured,
+  isPublicApiConfigured,
+  n8nWebhookUrls,
+  postN8nWebhook,
+  postPublicApi,
+  PUBLIC_API_ROUTES,
+} from "@/lib/public-api";
 
 export const PROJECT_PROBLEM_KEYS = ["conversion", "manual-work", "systems", "strategy"] as const;
 
@@ -18,8 +25,10 @@ type AcquisitionContext = {
 };
 
 export type ProjectConversationPayload = {
-  schemaVersion: "1.0";
+  schemaVersion: "1.1";
+  eventType: "project.conversation.submitted";
   eventId: string;
+  correlationId: string;
   submittedAt: string;
   locale: Locale;
   source: "visit-card";
@@ -148,17 +157,22 @@ export const captureFunnelContext = (): AcquisitionContext => {
 
 export const createProjectConversationPayload = (
   locale: Locale,
-  values: Omit<ProjectConversationPayload, "schemaVersion" | "eventId" | "submittedAt" | "locale" | "source" | "acquisition" | "consent">,
-): ProjectConversationPayload => ({
-  schemaVersion: "1.0",
-  eventId: createId(),
-  submittedAt: new Date().toISOString(),
-  locale,
-  source: "visit-card",
-  ...values,
-  acquisition: captureFunnelContext(),
-  consent: { replyRequested: true, marketing: false },
-});
+  values: Omit<ProjectConversationPayload, "schemaVersion" | "eventType" | "eventId" | "correlationId" | "submittedAt" | "locale" | "source" | "acquisition" | "consent">,
+): ProjectConversationPayload => {
+  const acquisition = captureFunnelContext();
+  return {
+    schemaVersion: "1.1",
+    eventType: "project.conversation.submitted",
+    eventId: createId(),
+    correlationId: acquisition.sessionId,
+    submittedAt: new Date().toISOString(),
+    locale,
+    source: "visit-card",
+    ...values,
+    acquisition,
+    consent: { replyRequested: true, marketing: false },
+  };
+};
 
 const buildEmailFallback = (payload: ProjectConversationPayload) => {
   const diagnostic = payload.diagnostic.requested
@@ -171,7 +185,13 @@ const buildEmailFallback = (payload: ProjectConversationPayload) => {
 export const submitProjectConversation = async (
   payload: ProjectConversationPayload,
 ): Promise<ConversationSubmissionResult> => {
-  if (!isPublicApiConfigured) return { kind: "email-fallback", href: buildEmailFallback(payload) };
-  await postPublicApi(PUBLIC_API_ROUTES.projectConversations, payload);
-  return { kind: "submitted" };
+  if (isPublicApiConfigured) {
+    await postPublicApi(PUBLIC_API_ROUTES.projectConversations, payload);
+    return { kind: "submitted" };
+  }
+  if (isN8nProjectConversationConfigured) {
+    await postN8nWebhook(n8nWebhookUrls.projectConversation, payload);
+    return { kind: "submitted" };
+  }
+  return { kind: "email-fallback", href: buildEmailFallback(payload) };
 };

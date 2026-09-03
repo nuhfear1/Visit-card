@@ -1,27 +1,23 @@
 # Backend-ready architecture
 
-Visit-card is currently exported as a static Next.js site and hosted on GitHub Pages. GitHub Pages cannot execute Next.js route handlers, Server Actions or server-only secrets. The frontend therefore talks to one stable public API origin, while the implementation behind that origin can evolve independently.
+Visit-card is currently exported as a static Next.js site and hosted on GitHub Pages. GitHub Pages cannot execute Next.js route handlers, Server Actions or server-only secrets. The launch therefore uses n8n production webhooks directly. A dedicated backend becomes the public entry point only after the commercial system has proved its value.
 
 ```text
-Visit-card (GitHub Pages)
-        -> Public API / gateway
-            -> n8n orchestration
-            -> CRM
-            -> transactional email
-            -> analytics and reporting
+Launch: Visit-card -> n8n -> CRM / email / webinar / reporting
+Later:  Visit-card -> Backend -> n8n -> the same connected tools
 ```
 
 ## Frontend configuration
 
-Only one public value is required:
+The launch uses the relevant n8n production webhook variables. The later backend uses:
 
 ```bash
 NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 ```
 
-The value is an origin without a trailing slash. It is public routing information, never a secret. CRM, n8n, email, OpenAI and anti-spam credentials belong in the backend environment.
+The API value is an origin without a trailing slash. It is public routing information, never a secret. CRM, email, OpenAI and anti-spam credentials remain inside n8n during the launch, then move behind the backend boundary where appropriate.
 
-When the variable is absent, the current project conversation form opens a pre-filled email. The site remains usable before the backend is deployed and during a backend outage investigation.
+Delivery priority is deterministic: backend when `NEXT_PUBLIC_API_BASE_URL` exists, otherwise n8n when the matching webhook exists, otherwise pre-filled email. This permits a later backend cutover without changing the form or its payload.
 
 ## Stable routes
 
@@ -48,6 +44,6 @@ The browser sends `Idempotency-Key` with the event ID and `X-Client-Version`. Th
 
 ## Migration options
 
-The public API can initially be a Vercel Function, Cloudflare Worker or small server. If the website later moves away from GitHub Pages, the same contract can be implemented with Next.js route handlers without changing the form or its copy.
+The public API can later be a Vercel Function, Cloudflare Worker or small server. If the website moves away from GitHub Pages, the same contract can be implemented with Next.js route handlers without changing the form, its copy or the n8n workflows behind it.
 
 The normative request and response schema lives in `docs/openapi.yaml`.

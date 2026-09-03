@@ -108,10 +108,12 @@ components:
     ProjectConversation:
       type: object
       additionalProperties: false
-      required: [schemaVersion, eventId, submittedAt, locale, source, contact, project, diagnostic, acquisition, consent]
+      required: [schemaVersion, eventType, eventId, correlationId, submittedAt, locale, source, contact, project, diagnostic, acquisition, consent]
       properties:
-        schemaVersion: { const: "1.0" }
+        schemaVersion: { const: "1.1" }
+        eventType: { const: project.conversation.submitted }
         eventId: { type: string, minLength: 8, maxLength: 120 }
+        correlationId: { type: string, minLength: 8, maxLength: 120 }
         submittedAt: { type: string, format: date-time }
         locale: { $ref: "#/components/schemas/Locale" }
         source: { const: visit-card }
@@ -150,10 +152,12 @@ components:
     MasterclassRegistration:
       type: object
       additionalProperties: false
-      required: [schemaVersion, eventId, submittedAt, locale, source, registration, acquisition, consent]
+      required: [schemaVersion, eventType, eventId, correlationId, submittedAt, locale, source, registration, acquisition, consent]
       properties:
-        schemaVersion: { const: "1.0" }
+        schemaVersion: { const: "1.1" }
+        eventType: { const: masterclass.registration.submitted }
         eventId: { type: string, minLength: 8, maxLength: 120 }
+        correlationId: { type: string, minLength: 8, maxLength: 120 }
         submittedAt: { type: string, format: date-time }
         locale: { $ref: "#/components/schemas/Locale" }
         source: { const: visit-card }
@@ -176,10 +180,12 @@ components:
     EngagementEvent:
       type: object
       additionalProperties: false
-      required: [schemaVersion, eventId, occurredAt, locale, source, name, sessionId]
+      required: [schemaVersion, eventType, eventId, correlationId, occurredAt, locale, source, name, sessionId]
       properties:
-        schemaVersion: { const: "1.0" }
+        schemaVersion: { const: "1.1" }
+        eventType: { const: engagement.event.submitted }
         eventId: { type: string, minLength: 8, maxLength: 120 }
+        correlationId: { type: string, minLength: 8, maxLength: 120 }
         occurredAt: { type: string, format: date-time }
         locale: { $ref: "#/components/schemas/Locale" }
         source: { const: visit-card }

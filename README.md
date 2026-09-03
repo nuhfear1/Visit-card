@@ -20,10 +20,12 @@ npm run dev
 
 The initial import is intentionally sanitized: legacy personal links, third-party portfolio destinations, old portraits and non-commercial font assets were removed or replaced with placeholders before publication.
 
-## Backend-ready API
+## Progressive delivery: n8n first, backend later
 
-The site remains compatible with GitHub Pages while using a stable public API boundary. The frontend never needs to know whether the backend delegates work to n8n, a CRM, an email provider or another service.
+The launch uses n8n production webhooks directly. This makes it possible to validate the complete acquisition, webinar and sales system before investing in a dedicated backend.
 
-Set `NEXT_PUBLIC_API_BASE_URL` in `.env.local` for development or as a GitHub Actions repository variable for Pages builds. When it is not configured, the conversation form falls back to a pre-filled email so the contact path remains usable.
+Set the relevant `NEXT_PUBLIC_N8N_*_WEBHOOK_URL` values in `.env.local` or as GitHub Actions repository variables. When the project conversation webhook is absent, the form falls back to a pre-filled email.
 
-Architecture and API contracts are documented in `docs/backend-architecture.md` and `docs/openapi.yaml`. The role of n8n behind the backend boundary is documented in `docs/n8n-endpoints.md`.
+Later, setting `NEXT_PUBLIC_API_BASE_URL` moves public ingestion to the backend. The backend then delegates orchestration to n8n while the frontend payload and visitor experience remain unchanged. When both are configured, the backend takes priority.
+
+The complete launch automation is documented in `docs/n8n-launch-system.md`. Future backend architecture and API contracts remain documented in `docs/backend-architecture.md` and `docs/openapi.yaml`.
