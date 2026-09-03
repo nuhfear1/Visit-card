@@ -3,10 +3,11 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ArrowUpRight, Mail, Phone, MessageCircle, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Mail, Phone, MessageCircle, type LucideIcon } from "lucide-react";
 import { getCopy, type Locale } from "@/lib/i18n";
 import useReducedMotion from "@/hooks/useReducedMotion";
 import ProjectConversationForm from "@/components/ProjectConversationForm";
+import { contactFormCopy } from "@/lib/contact-form-copy";
 
 type ContactLink = {
   label: string;
@@ -21,6 +22,7 @@ export default function Contact({ locale = "fr" }: { locale?: Locale }) {
   const titleRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const copy = getCopy(locale).contactPage;
+  const formCopy = contactFormCopy[locale];
   const isRtl = locale === "ar";
   const reducedMotion = useReducedMotion();
 
@@ -50,6 +52,9 @@ export default function Contact({ locale = "fr" }: { locale?: Locale }) {
             <span className="block text-stroke-orange">{copy.headline[1]}</span>
           </h1>
           <p className="mt-8 max-w-2xl font-jakarta text-sm leading-7 text-[#161616]/65 md:text-base">{copy.intro}</p>
+          <a href="#project-conversation" className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-[#161616]/20 bg-white/45 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.16em] transition hover:border-[#F44A22] hover:bg-[#F44A22] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F44A22]">
+            {formCopy.jumpToForm}<ArrowDown size={14} />
+          </a>
         </div>
 
         <div ref={cardsRef} className="grid w-full grid-cols-1 gap-4 md:grid-cols-3">
@@ -80,10 +85,6 @@ export default function Contact({ locale = "fr" }: { locale?: Locale }) {
 
       <ProjectConversationForm locale={locale} />
 
-      <div className="mx-auto mt-14 flex max-w-7xl items-center justify-between border-t border-[#161616]/20 pt-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#161616]/50">
-        <span>Gary WILFRED-BORILLA</span>
-        <span>© 2026</span>
-      </div>
     </section>
   );
 }
