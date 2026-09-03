@@ -1,7 +1,9 @@
 {
   "name": "Gary Wilfred-Borilla launch system",
   "schemaVersion": "1.0",
-  "generatedAt": "2026-09-03T18:25:00.060Z",
+  "format": "individual-n8n-workflow-json",
+  "uiImportable": true,
+  "generatedAt": "2026-09-03T18:51:21.125Z",
   "workflowCount": 22,
   "importOrder": [
     {

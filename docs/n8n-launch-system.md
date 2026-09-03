@@ -14,9 +14,9 @@ visitor -> registration -> attendance -> intent -> conversation -> opportunity -
 
 The repository now contains the complete generated pack:
 
-- `n8n/gary-launch.bundle.json` for CLI import;
-- `n8n/workflows/*.json` for individual UI import;
-- `n8n/manifest.json` for dependency order and endpoints;
+- `n8n/gary-launch.n8np` for grouped import through the current n8n API CLI;
+- `n8n/gary-launch-individual-workflows.zip` and `n8n/workflows/*.json` for compatible editor UI import;
+- `n8n/import-order.json` for dependency order and endpoints;
 - `n8n/fixtures/*.json` for safe acceptance tests;
 - `n8n/README.md` for credentials, provider mapping and activation.
 

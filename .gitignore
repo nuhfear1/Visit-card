@@ -26,6 +26,7 @@ yarn-error.log*
 # local env files
 .env*.local
 n8n/config/gary-launch.config.json
+n8n/.package-build/
 
 # vercel
 .vercel

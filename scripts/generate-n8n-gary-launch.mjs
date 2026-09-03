@@ -26,6 +26,7 @@ const root = resolve(import.meta.dirname, "..");
 const configPath = resolve(root, "n8n/config/gary-launch.config.json");
 const exampleConfigPath = resolve(root, "n8n/config/gary-launch.config.example.json");
 const outputDir = resolve(root, "n8n/workflows");
+const importOrderPath = resolve(root, "n8n/import-order.json");
 
 const readConfig = async () => {
   try {
@@ -36,6 +37,9 @@ const readConfig = async () => {
 };
 
 const config = await readConfig();
+const generatedAt = await readFile(importOrderPath, "utf8")
+  .then((content) => JSON.parse(content).generatedAt)
+  .catch(() => new Date().toISOString());
 const configLiteral = JSON.stringify(config);
 const bakedConfigCode = `const config = ${configLiteral};\nreturn $input.all().map((item) => ({ json: { ...item.json, _config: config } }));`;
 const extractWebhookCode = `const request = $json;\nconst body = request.body && typeof request.body === 'object' ? request.body : request;\nconst config = ${configLiteral};\nreturn [{ json: { ...body, _request: { headers: request.headers || {}, receivedAt: new Date().toISOString() }, _config: config } }];`;
@@ -507,11 +511,12 @@ const fileNames = {
 
 await mkdir(outputDir, { recursive: true });
 await Promise.all(workflows.map((item) => writeFile(resolve(outputDir, fileNames[item.id]), `${JSON.stringify(item, null, 2)}\n`)));
-await writeFile(resolve(root, "n8n/gary-launch.bundle.json"), `${JSON.stringify(workflows, null, 2)}\n`);
-await writeFile(resolve(root, "n8n/manifest.json"), `${JSON.stringify({
+await writeFile(importOrderPath, `${JSON.stringify({
   name: "Gary Wilfred-Borilla launch system",
   schemaVersion: "1.0",
-  generatedAt: new Date().toISOString(),
+  format: "individual-n8n-workflow-json",
+  uiImportable: true,
+  generatedAt,
   workflowCount: workflows.length,
   importOrder: workflows.map((item) => ({ id: item.id, name: item.name, file: `workflows/${fileNames[item.id]}` })),
   publicWebhooks: {
