@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n";
+import { isPublicApiConfigured, postPublicApi, PUBLIC_API_ROUTES } from "@/lib/public-api";
 
 export const PROJECT_PROBLEM_KEYS = ["conversion", "manual-work", "systems", "strategy"] as const;
 
@@ -51,14 +52,6 @@ export type ConversationSubmissionResult =
 const CONTEXT_KEY = "gwb:funnel-context:v1";
 const SESSION_KEY = "gwb:session-id:v1";
 const CONTACT_EMAIL = "garywilfredborilla@gmail.com";
-const REQUEST_TIMEOUT_MS = 12_000;
-
-export const funnelEndpoints = {
-  projectConversation: process.env.NEXT_PUBLIC_PROJECT_CONVERSATION_ENDPOINT?.trim() || "",
-  masterclassRegistration: process.env.NEXT_PUBLIC_MASTERCLASS_REGISTRATION_ENDPOINT?.trim() || "",
-  engagementEvent: process.env.NEXT_PUBLIC_FUNNEL_EVENT_ENDPOINT?.trim() || "",
-} as const;
-
 const isProblemKey = (value: string | null): value is ProjectProblemKey =>
   Boolean(value && PROJECT_PROBLEM_KEYS.includes(value as ProjectProblemKey));
 
@@ -178,21 +171,7 @@ const buildEmailFallback = (payload: ProjectConversationPayload) => {
 export const submitProjectConversation = async (
   payload: ProjectConversationPayload,
 ): Promise<ConversationSubmissionResult> => {
-  const endpoint = funnelEndpoints.projectConversation;
-  if (!endpoint) return { kind: "email-fallback", href: buildEmailFallback(payload) };
-
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
-    if (!response.ok) throw new Error(`Project conversation endpoint returned ${response.status}`);
-    return { kind: "submitted" };
-  } finally {
-    window.clearTimeout(timeout);
-  }
+  if (!isPublicApiConfigured) return { kind: "email-fallback", href: buildEmailFallback(payload) };
+  await postPublicApi(PUBLIC_API_ROUTES.projectConversations, payload);
+  return { kind: "submitted" };
 };

@@ -20,10 +20,10 @@ npm run dev
 
 The initial import is intentionally sanitized: legacy personal links, third-party portfolio destinations, old portraits and non-commercial font assets were removed or replaced with placeholders before publication.
 
-## Automation endpoints
+## Backend-ready API
 
-The static site can send structured project conversations to n8n without embedding private credentials in the browser. Copy `.env.example` to `.env.local` for development, or configure the matching GitHub Actions repository variables for Pages builds.
+The site remains compatible with GitHub Pages while using a stable public API boundary. The frontend never needs to know whether the backend delegates work to n8n, a CRM, an email provider or another service.
 
-When `NEXT_PUBLIC_PROJECT_CONVERSATION_ENDPOINT` is not configured, the conversation form falls back to a pre-filled email so the contact path remains usable.
+Set `NEXT_PUBLIC_API_BASE_URL` in `.env.local` for development or as a GitHub Actions repository variable for Pages builds. When it is not configured, the conversation form falls back to a pre-filled email so the contact path remains usable.
 
-The payload contracts and the expected n8n responses are documented in `docs/n8n-endpoints.md`.
+Architecture and API contracts are documented in `docs/backend-architecture.md` and `docs/openapi.yaml`. The role of n8n behind the backend boundary is documented in `docs/n8n-endpoints.md`.

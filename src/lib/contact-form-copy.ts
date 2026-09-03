@@ -5,6 +5,7 @@ export type ContactFormCopy = {
   eyebrow: string;
   headline: [string, string];
   intro: string;
+  jumpToForm: string;
   selectedProblem: string;
   name: string;
   namePlaceholder: string;
@@ -40,6 +41,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
     eyebrow: "COMMENCER LA DISCUSSION",
     headline: ["QUELQUES LIGNES", "SUFFISENT."],
     intro: "Parlez-moi de ce que vous cherchez à obtenir et de ce qui vous arrête aujourd’hui. Je lirai votre message personnellement avant de vous répondre.",
+    jumpToForm: "ÉCRIRE QUELQUES LIGNES",
     selectedProblem: "Vous aviez repéré ce point :",
     name: "Votre prénom et votre nom", namePlaceholder: "Comment dois-je vous appeler ?",
     email: "Votre email", emailPlaceholder: "vous@entreprise.com",
@@ -62,6 +64,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   en: {
     eyebrow: "START THE CONVERSATION", headline: ["A FEW LINES", "ARE ENOUGH."],
     intro: "Tell me what you are trying to achieve and what is getting in the way. I will read your message personally before I reply.",
+    jumpToForm: "WRITE A FEW LINES",
     selectedProblem: "You had identified this point:",
     name: "Your name", namePlaceholder: "What should I call you?", email: "Your email", emailPlaceholder: "you@company.com",
     organisation: "Company", organisationPlaceholder: "Company name", website: "Website or useful link", websitePlaceholder: "https://",
@@ -80,6 +83,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   es: {
     eyebrow: "EMPEZAR LA CONVERSACIÓN", headline: ["CON UNAS LÍNEAS", "ES SUFICIENTE."],
     intro: "Cuéntame qué quieres conseguir y qué te está frenando hoy. Leeré personalmente tu mensaje antes de responderte.",
+    jumpToForm: "ESCRIBIR UNAS LÍNEAS",
     selectedProblem: "Habías identificado este punto:",
     name: "Tu nombre", namePlaceholder: "¿Cómo quieres que te llame?", email: "Tu email", emailPlaceholder: "tu@empresa.com",
     organisation: "Empresa", organisationPlaceholder: "Nombre de la empresa", website: "Sitio o enlace útil", websitePlaceholder: "https://",
@@ -98,6 +102,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   pt: {
     eyebrow: "COMEÇAR A CONVERSA", headline: ["ALGUMAS LINHAS", "JÁ BASTAM."],
     intro: "Conte o que você quer alcançar e o que está travando hoje. Vou ler sua mensagem pessoalmente antes de responder.",
+    jumpToForm: "ESCREVER ALGUMAS LINHAS",
     selectedProblem: "Você tinha identificado este ponto:",
     name: "Seu nome", namePlaceholder: "Como devo chamar você?", email: "Seu e-mail", emailPlaceholder: "voce@empresa.com",
     organisation: "Empresa", organisationPlaceholder: "Nome da empresa", website: "Site ou link útil", websitePlaceholder: "https://",
@@ -116,6 +121,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   gcf: {
     eyebrow: "KOUMANSÉ PALÉ", headline: ["DÉOTWA LIGN", "JA SIFI."],
     intro: "Di-mwen ka ou vlé rivé fè é ka ki ka frenné-w jòdijou. An ké li mésaj a-w mwenmen avan an réponn-vou.",
+    jumpToForm: "MAKÉ DÉOTWA LIGN",
     selectedProblem: "Ou té ja vwè pwen-lasa:",
     name: "Non a-w", namePlaceholder: "Kijan pou an kriyé-w?", email: "Imèl a-w", emailPlaceholder: "ou@antrepriz.com",
     organisation: "Antrepriz", organisationPlaceholder: "Non a antrepriz-la", website: "Sit oben lyen itil", websitePlaceholder: "https://",
@@ -134,6 +140,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   ar: {
     eyebrow: "ابدأ الحوار", headline: ["بضع كلمات", "تكفي."],
     intro: "أخبرني بما تريد تحقيقه وما الذي يعيقك اليوم. سأقرأ رسالتك بنفسي قبل أن أجيبك.",
+    jumpToForm: "اكتب بضع كلمات",
     selectedProblem: "كنت قد حددت هذه النقطة:",
     name: "الاسم", namePlaceholder: "بأي اسم أخاطبك؟", email: "البريد الإلكتروني", emailPlaceholder: "you@company.com",
     organisation: "الشركة", organisationPlaceholder: "اسم الشركة", website: "الموقع أو رابط مفيد", websitePlaceholder: "https://",
@@ -152,6 +159,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   ja: {
     eyebrow: "相談を始める", headline: ["数行だけで", "十分です。"],
     intro: "実現したいことと、今どこで止まっているかを教えてください。内容は私自身が確認してからお返事します。",
+    jumpToForm: "数行で相談する",
     selectedProblem: "先ほど選んだ課題：",
     name: "お名前", namePlaceholder: "お名前をご記入ください", email: "メールアドレス", emailPlaceholder: "you@company.com",
     organisation: "会社名", organisationPlaceholder: "会社名", website: "Webサイト・参考URL", websitePlaceholder: "https://",
@@ -170,6 +178,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   zh: {
     eyebrow: "开始沟通", headline: ["几句话", "就够了。"],
     intro: "告诉我你想实现什么，以及目前卡在哪里。我会亲自阅读后再回复你。",
+    jumpToForm: "写几句话",
     selectedProblem: "你刚才关注的是：",
     name: "姓名", namePlaceholder: "我该如何称呼你？", email: "邮箱", emailPlaceholder: "you@company.com",
     organisation: "公司", organisationPlaceholder: "公司名称", website: "网站或相关链接", websitePlaceholder: "https://",
@@ -188,6 +197,7 @@ export const contactFormCopy: Record<Locale, ContactFormCopy> = {
   ko: {
     eyebrow: "대화 시작하기", headline: ["몇 줄이면", "충분합니다."],
     intro: "무엇을 이루고 싶은지, 지금 어디에서 막혀 있는지 알려주세요. 제가 직접 읽고 답변드리겠습니다.",
+    jumpToForm: "몇 줄 남기기",
     selectedProblem: "앞에서 선택한 문제:",
     name: "이름", namePlaceholder: "어떻게 불러드리면 될까요?", email: "이메일", emailPlaceholder: "you@company.com",
     organisation: "회사", organisationPlaceholder: "회사명", website: "웹사이트 또는 참고 링크", websitePlaceholder: "https://",

@@ -87,7 +87,7 @@ export default function ProjectConversationForm({ locale }: { locale: Locale }) 
   }
 
   return (
-    <section id="project-conversation" className="mx-auto mt-24 max-w-7xl rounded-[2.5rem] bg-[#161616] px-6 py-10 text-white md:px-10 md:py-14 lg:px-14" dir={isRtl ? "rtl" : "ltr"}>
+    <section id="project-conversation" className="mx-auto mt-24 max-w-7xl scroll-mt-28 rounded-[2.5rem] bg-[#161616] px-6 py-10 text-white md:px-10 md:py-14 lg:px-14" dir={isRtl ? "rtl" : "ltr"}>
       <div className="grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16">
         <div>
           <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F44A22]">{copy.eyebrow}</div>

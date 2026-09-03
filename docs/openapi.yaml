@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: Visit-card Public API
+  version: 1.0.0
+  description: Stable public boundary between the static Visit-card frontend and its future backend.
+servers:
+  - url: https://api.example.com
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      responses:
+        "200":
+          description: Service ready
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    const: ok
+  /v1/project-conversations:
+    post:
+      operationId: createProjectConversation
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/ClientVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectConversation"
+      responses:
+        "202": { $ref: "#/components/responses/Accepted" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /v1/masterclass/registrations:
+    post:
+      operationId: createMasterclassRegistration
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/ClientVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MasterclassRegistration"
+      responses:
+        "202": { $ref: "#/components/responses/Accepted" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /v1/events:
+    post:
+      operationId: createEngagementEvent
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/ClientVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EngagementEvent"
+      responses:
+        "202": { $ref: "#/components/responses/Accepted" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 8, maxLength: 120 }
+    ClientVersion:
+      name: X-Client-Version
+      in: header
+      required: true
+      schema: { type: string, maxLength: 50 }
+  schemas:
+    Locale:
+      type: string
+      enum: [fr, en, es, pt, gcf, ar, ja, zh, ko]
+    ProblemKey:
+      type: string
+      enum: [conversion, manual-work, systems, strategy, ""]
+    Acquisition:
+      type: object
+      additionalProperties: false
+      required: [source, medium, campaign, content, term, referrer, landingPage, sessionId, problem]
+      properties:
+        source: { type: string, maxLength: 200 }
+        medium: { type: string, maxLength: 200 }
+        campaign: { type: string, maxLength: 200 }
+        content: { type: string, maxLength: 200 }
+        term: { type: string, maxLength: 200 }
+        referrer: { type: string, maxLength: 500 }
+        landingPage: { type: string, maxLength: 500 }
+        sessionId: { type: string, minLength: 8, maxLength: 120 }
+        problem: { $ref: "#/components/schemas/ProblemKey" }
+    ProjectConversation:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, eventId, submittedAt, locale, source, contact, project, diagnostic, acquisition, consent]
+      properties:
+        schemaVersion: { const: "1.0" }
+        eventId: { type: string, minLength: 8, maxLength: 120 }
+        submittedAt: { type: string, format: date-time }
+        locale: { $ref: "#/components/schemas/Locale" }
+        source: { const: visit-card }
+        contact:
+          type: object
+          additionalProperties: false
+          required: [name, email, organisation, website]
+          properties:
+            name: { type: string, minLength: 1, maxLength: 120 }
+            email: { type: string, format: email, maxLength: 180 }
+            organisation: { type: string, maxLength: 160 }
+            website: { type: string, maxLength: 300 }
+        project:
+          type: object
+          additionalProperties: false
+          required: [message, problem]
+          properties:
+            message: { type: string, minLength: 20, maxLength: 4000 }
+            problem: { $ref: "#/components/schemas/ProblemKey" }
+        diagnostic:
+          type: object
+          additionalProperties: false
+          required: [requested, focus, context]
+          properties:
+            requested: { type: boolean }
+            focus: { $ref: "#/components/schemas/ProblemKey" }
+            context: { type: string, maxLength: 1800 }
+        acquisition: { $ref: "#/components/schemas/Acquisition" }
+        consent:
+          type: object
+          additionalProperties: false
+          required: [replyRequested, marketing]
+          properties:
+            replyRequested: { const: true }
+            marketing: { const: false }
+    MasterclassRegistration:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, eventId, submittedAt, locale, source, registration, acquisition, consent]
+      properties:
+        schemaVersion: { const: "1.0" }
+        eventId: { type: string, minLength: 8, maxLength: 120 }
+        submittedAt: { type: string, format: date-time }
+        locale: { $ref: "#/components/schemas/Locale" }
+        source: { const: visit-card }
+        registration:
+          type: object
+          additionalProperties: false
+          required: [name, email]
+          properties:
+            name: { type: string, minLength: 1, maxLength: 120 }
+            email: { type: string, format: email, maxLength: 180 }
+            organisation: { type: string, maxLength: 160 }
+        acquisition: { $ref: "#/components/schemas/Acquisition" }
+        consent:
+          type: object
+          additionalProperties: false
+          required: [registration, marketing]
+          properties:
+            registration: { const: true }
+            marketing: { type: boolean }
+    EngagementEvent:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, eventId, occurredAt, locale, source, name, sessionId]
+      properties:
+        schemaVersion: { const: "1.0" }
+        eventId: { type: string, minLength: 8, maxLength: 120 }
+        occurredAt: { type: string, format: date-time }
+        locale: { $ref: "#/components/schemas/Locale" }
+        source: { const: visit-card }
+        name:
+          type: string
+          enum: [masterclass_cta_clicked, diagnostic_requested, replay_started, booking_clicked]
+        sessionId: { type: string, minLength: 8, maxLength: 120 }
+    Accepted:
+      type: object
+      additionalProperties: false
+      required: [accepted, eventId, requestId]
+      properties:
+        accepted: { const: true }
+        eventId: { type: string }
+        requestId: { type: string }
+    Error:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, requestId, retryable]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            requestId: { type: string }
+            retryable: { type: boolean }
+  responses:
+    Accepted:
+      description: Request accepted for asynchronous processing
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Accepted" }
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: Origin or anti-abuse validation failed
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Conflict:
+      description: Idempotency conflict
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    RateLimited:
+      description: Too many requests
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ServerError:
+      description: Temporary server failure
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
