@@ -1,0 +1,93 @@
+{
+  "id": "gwbS02IdentityV1",
+  "name": "GWB | S02 | Resolve Identity",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c47ba835-f371-40dd-adce-539ef9e61e45",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\nWITH upserted AS (\n  INSERT INTO gwb_launch.subjects (email_normalized, display_name, organisation, external_refs, last_seen_at)\n  SELECT $1, NULLIF($2, ''), NULLIF($3, ''), COALESCE($4::jsonb, '{}'::jsonb), now()\n  WHERE NULLIF($1, '') IS NOT NULL\n  ON CONFLICT (email_normalized) DO UPDATE SET\n    display_name = COALESCE(EXCLUDED.display_name, gwb_launch.subjects.display_name),\n    organisation = COALESCE(EXCLUDED.organisation, gwb_launch.subjects.organisation),\n    external_refs = gwb_launch.subjects.external_refs || EXCLUDED.external_refs,\n    last_seen_at = now()\n  RETURNING subject_key, external_refs\n), correlated AS (\n  SELECT s.subject_key, s.external_refs\n  FROM gwb_launch.events e\n  JOIN gwb_launch.subjects s USING (subject_key)\n  WHERE e.correlation_id = $6 AND e.subject_key IS NOT NULL\n  ORDER BY e.occurred_at DESC\n  LIMIT 1\n), resolved AS (\n  SELECT subject_key, external_refs FROM upserted\n  UNION ALL\n  SELECT subject_key, external_refs FROM correlated WHERE NOT EXISTS (SELECT 1 FROM upserted)\n)\nSELECT\n  COALESCE((SELECT subject_key::text FROM resolved LIMIT 1), '') AS subject_key,\n  COALESCE((SELECT external_refs FROM resolved LIMIT 1), '{}'::jsonb) AS external_refs,\n  $5::jsonb AS original_event;",
+        "options": {
+          "queryReplacement": "={{ [\n  $json.normalizedEmail,\n  $json.contact?.name || $json.registration?.name || $json.attendee?.name || $json.booking?.name || '',\n  $json.contact?.organisation || $json.registration?.organisation || $json.payload?.organisation || '',\n  JSON.stringify($json.externalRefs || {}),\n  JSON.stringify($json), $json.correlationId\n] }}"
+        }
+      },
+      "id": "eb0d9e59-7d68-432f-8997-0d4a47720e88",
+      "name": "Resolve Identity",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $json;\nconst event = typeof row.original_event === 'string' ? JSON.parse(row.original_event) : row.original_event;\nreturn [{ json: { ...event, subjectKey: row.subject_key, externalRefs: { ...(event.externalRefs || {}), ...(row.external_refs || {}) } } }];"
+      },
+      "id": "97ebccbc-8d25-449d-a341-12676b46f83b",
+      "name": "Restore Canonical Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Resolve Identity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Identity": {
+      "main": [
+        [
+          {
+            "node": "Restore Canonical Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Resolve one durable subjectKey and preserve cross-tool references.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "51f7caf9-b108-4458-964a-ef356f1495dc"
+}

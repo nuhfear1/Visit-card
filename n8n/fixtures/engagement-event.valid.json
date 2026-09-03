@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.1",
+  "eventType": "engagement.event.submitted",
+  "eventId": "demo-engagement-0001",
+  "correlationId": "demo-journey-0001",
+  "occurredAt": "2026-09-10T18:15:00.000Z",
+  "locale": "fr",
+  "source": "visit-card",
+  "name": "diagnostic_requested",
+  "sessionId": "demo-journey-0001",
+  "page": "/fr/masterclass/replay",
+  "within90Days": true
+}

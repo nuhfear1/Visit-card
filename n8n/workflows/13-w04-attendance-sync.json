@@ -1,0 +1,537 @@
+{
+  "id": "gwbW04AttendanceV1",
+  "name": "GWB | W04 | Engagement and Attendance Sync",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/webinar-attendance",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5f93be93-becf-47b0-a6c8-f2045e46a6fe",
+      "name": "Webinar Attendance Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "e1b1e778-02d1-4580-970e-47b647b162a1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_INTERNAL_WEBHOOK_CREDENTIAL_ID",
+          "name": "GWB Internal Webhook Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const request=$json; const body=request.body||request; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const email=String(body.email||body.attendee?.email||body.participant?.email||'').trim().toLowerCase(); const attended=body.attended!==false && Number(body.durationMinutes||body.duration||0)>0; const sourceId=body.id||body.attendanceId||body.participant?.id||$execution.id; return [{json:{schemaVersion:'1.1',eventType:attended?'webinar.attended':'webinar.no_show',eventId:'webinar:'+sourceId,correlationId:body.correlationId||body.correlation_id||sourceId,occurredAt:body.occurredAt||body.endedAt||new Date().toISOString(),sourceSystem:cfg.webinar.provider,attendee:{name:body.name||body.attendee?.name||'',email},externalRefs:{webinarAttendanceId:String(sourceId),webinarRegistrantId:String(body.registrantId||'')},consent:{registration:true,marketing:Boolean(body.marketingConsent)},payload:{email,name:body.name||'',durationMinutes:Number(body.durationMinutes||body.duration||0),polls:body.polls||[],questions:body.questions||[],ctaClicked:Boolean(body.ctaClicked),attended},_config:cfg}}];"
+      },
+      "id": "a26ea0fa-e829-481e-8bd1-6ccd947816c5",
+      "name": "Normalize Attendance",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/engagement-event",
+        "authentication": "none",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://REPLACE_WITH_SITE_ORIGIN"
+        }
+      },
+      "id": "389fb603-a1c2-4149-aab4-0903f998818b",
+      "name": "First-party Engagement Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        220
+      ],
+      "webhookId": "a7922cc3-58a4-4215-8a49-070c3cc38fe9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const request=$json; const body=request.body||request; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const map={masterclass_cta_clicked:'webinar.cta_clicked',diagnostic_requested:'diagnostic.requested',replay_started:'replay.started',booking_clicked:'booking.clicked'}; const eventType=map[body.name]||''; return [{json:{schemaVersion:'1.1',eventType,eventId:String(body.eventId||'engagement:'+$execution.id),correlationId:String(body.correlationId||body.sessionId||$execution.id),occurredAt:body.occurredAt||new Date().toISOString(),sourceSystem:'visit-card',normalizedEmail:String(body.email||'').trim().toLowerCase(),externalRefs:{},consent:{registration:Boolean(body.registration),marketing:false},payload:{name:body.name,sessionId:body.sessionId,locale:body.locale||'fr',page:body.page||'',within90Days:Boolean(body.within90Days)},_config:cfg}}];"
+      },
+      "id": "7774bf8b-c0ca-4eaa-bea9-2a2d1cf65578",
+      "name": "Normalize First-party Engagement",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS01ValidateV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "e32caf57-50ed-4c57-b16e-6c787292b807",
+      "name": "S01 Validate Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "62ce68d9-9eb4-465f-aab3-232638afd470",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "55c7a3d2-8ea2-4188-b1ff-315b43190f86",
+      "name": "Valid Engagement?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { accepted:false, error:{ code:'invalid_engagement', details:$json.validationErrors } } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "33d2c718-a708-4fb5-9a86-4c58af1c009c",
+      "name": "Reject Engagement",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        960,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS02IdentityV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "89c35d54-8af8-4ada-a340-d0aa0e977458",
+      "name": "S02 Resolve Identity",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "1d505ee2-de94-4a7f-9ac4-341d337ec927",
+      "name": "S03 Store Engagement",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0ad7dcc3-bc07-4510-9ae9-0536c1c84b9b",
+              "leftValue": "={{ $json.ledger?.inserted === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7877d129-488e-4102-b705-027207d15151",
+      "name": "New Engagement?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,duplicate:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "b8977722-7853-4b41-b556-c89b67ed9b85",
+      "name": "Accept Duplicate Safely",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { accepted:true, eventId:$json.eventId } }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "f7323e9a-ebaa-411b-a672-d77d6d3d8e03",
+      "name": "Accept Engagement",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "24b441ad-328a-4999-a75d-ffb10f2c4ec3",
+              "leftValue": "={{ Boolean($json.subjectKey) }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "bc88e1cd-a839-46cf-b3fc-e2e61018ed34",
+      "name": "Known Identity?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbW05IntentV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "51f45cda-3da1-42bc-92a3-74a8d5a649ec",
+      "name": "W05 Recalculate Intent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2735966b-bcef-4d0c-a453-271105e7a914",
+              "leftValue": "={{ ['webinar.attended','webinar.no_show'].includes($json.payload?.triggerEvent?.eventType) }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a2765895-c79f-48a1-80c7-035ae73c103a",
+      "name": "Attendance Follow-up?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2400,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbW06FollowupV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "d14bcb68-f2bf-46fa-b012-c23b5ec2a655",
+      "name": "W06 Segment Follow-up",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2640,
+        -200
+      ]
+    }
+  ],
+  "connections": {
+    "Webinar Attendance Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Attendance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Attendance": {
+      "main": [
+        [
+          {
+            "node": "S01 Validate Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "First-party Engagement Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize First-party Engagement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize First-party Engagement": {
+      "main": [
+        [
+          {
+            "node": "S01 Validate Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S01 Validate Event": {
+      "main": [
+        [
+          {
+            "node": "Valid Engagement?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Engagement?": {
+      "main": [
+        [
+          {
+            "node": "S02 Resolve Identity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Engagement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S02 Resolve Identity": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Engagement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Engagement": {
+      "main": [
+        [
+          {
+            "node": "New Engagement?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Engagement?": {
+      "main": [
+        [
+          {
+            "node": "Accept Engagement",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Accept Duplicate Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept Engagement": {
+      "main": [
+        [
+          {
+            "node": "Known Identity?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Known Identity?": {
+      "main": [
+        [
+          {
+            "node": "W05 Recalculate Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "W05 Recalculate Intent": {
+      "main": [
+        [
+          {
+            "node": "Attendance Follow-up?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attendance Follow-up?": {
+      "main": [
+        [
+          {
+            "node": "W06 Segment Follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Provider-neutral attendance plus allowlisted first-party CTA and replay event ingestion.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "1cdbb25b-8da5-4d23-9c6b-fa8b1e437921"
+}

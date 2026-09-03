@@ -1,0 +1,207 @@
+{
+  "id": "gwbW05IntentV1",
+  "name": "GWB | W05 | Intent Engine",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "a35f7725-436a-435c-b9c8-6e34fe265469",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COALESCE(jsonb_agg(jsonb_build_object('eventType',event_type,'occurredAt',occurred_at,'payload',payload) ORDER BY occurred_at),'[]'::jsonb) AS history, $2::jsonb AS trigger_event\nFROM gwb_launch.events WHERE subject_key=$1::uuid;",
+        "options": {
+          "queryReplacement": "={{ [$json.subjectKey, JSON.stringify($json)] }}"
+        }
+      },
+      "id": "b5a0b981-a260-444a-946f-c0ac75bd1dde",
+      "name": "Load Journey Events",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row=$json; const trigger=typeof row.trigger_event==='string'?JSON.parse(row.trigger_event):row.trigger_event; const history=typeof row.history==='string'?JSON.parse(row.history):row.history||[]; const has=(type,predicate=()=>true)=>history.some(e=>e.eventType===type&&predicate(e.payload||{})); const yes=new Set(['true','yes','oui','si','sim','ja','はい','是','예']); const urgentPoll=history.some(e=>(e.payload?.polls||[]).some(p=>/90|urgent|urgence|priorit/i.test(String(p.question||''))&&yes.has(String(p.answer||'').trim().toLowerCase()))); const signals={registration:has('masterclass.registration.submitted'),icpCompatible:Boolean(trigger.contact?.organisation||trigger.registration?.organisation||history.some(e=>e.payload?.organisation||e.payload?.contact?.organisation||e.payload?.registration?.organisation)),liveAttendance:has('webinar.attended'),watched30:has('webinar.attended',p=>Number(p.durationMinutes||0)>30),pollAnswered:has('webinar.poll_answered')||has('webinar.attended',p=>Array.isArray(p.polls)&&p.polls.length>0),urgent90:Boolean(trigger.payload?.within90Days)||history.some(e=>e.payload?.within90Days===true)||urgentPoll,diagnostic:has('diagnostic.requested')||Boolean(trigger.diagnostic?.requested)||history.some(e=>e.payload?.diagnostic?.requested===true),caseStudy:has('case.study.viewed'),qualifiedBooking:has('booking.created')}; const points={registration:5,icpCompatible:15,liveAttendance:15,watched30:10,pollAnswered:5,urgent90:15,diagnostic:20,caseStudy:5,qualifiedBooking:40}; const contributions=Object.entries(signals).filter(([,v])=>v).map(([key])=>({signal:key,points:points[key]})); const value=contributions.reduce((sum,s)=>sum+s.points,0); const temperature=value>=75?'priority':value>=50?'sales-ready':value>=25?'warm':'cold'; return [{json:{...trigger,schemaVersion:'1.1',eventType:'intent.score.changed',eventId:trigger.eventId+':score:'+value,occurredAt:new Date().toISOString(),sourceSystem:'n8n',consent:trigger.consent||{},payload:{score:value,temperature,contributions,triggerEvent:trigger},score:value,temperature,contributions}}];"
+      },
+      "id": "409446df-8a34-4eee-b039-a14aaef65329",
+      "name": "Calculate Explainable Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Calculate Explainable Score').item.json._config.hubspot.baseUrl + '/crm/v3/objects/contacts/batch/upsert' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ inputs:[{ id:$('Calculate Explainable Score').item.json.normalizedEmail, idProperty:'email', properties:{ email:$('Calculate Explainable Score').item.json.normalizedEmail, [$('Calculate Explainable Score').item.json._config.hubspot.scoreProperty]:String($('Calculate Explainable Score').item.json.score), [$('Calculate Explainable Score').item.json._config.hubspot.temperatureProperty]:$('Calculate Explainable Score').item.json.temperature } }] }) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "2daa171a-14a0-4f0c-840e-a75976196ac8",
+      "name": "Update HubSpot Intent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_HUBSPOT_CREDENTIAL_ID",
+          "name": "GWB HubSpot Private App"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const event=$('Calculate Explainable Score').item.json; const hubspotId=$json.results?.[0]?.id||event.externalRefs?.hubspotContactId||''; return [{json:{...event,externalRefs:{...(event.externalRefs||{}),hubspotContactId:hubspotId}}}];"
+      },
+      "id": "10e00ccd-d406-4e04-94aa-dc030dacb0f0",
+      "name": "Restore Score Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "2c6483b9-8ccd-4864-9cff-0e3d2e56e0bc",
+      "name": "S03 Store Score",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Load Journey Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Journey Events": {
+      "main": [
+        [
+          {
+            "node": "Calculate Explainable Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Explainable Score": {
+      "main": [
+        [
+          {
+            "node": "Update HubSpot Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update HubSpot Intent": {
+      "main": [
+        [
+          {
+            "node": "Restore Score Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Score Event": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Explainable score with stored contributing signals and CRM temperature.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "0fc9c92f-6bc9-449a-864f-1ed109969dcd"
+}

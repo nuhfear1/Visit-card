@@ -1,0 +1,388 @@
+{
+  "id": "gwbW11ContentV1",
+  "name": "GWB | W11 | Content Factory",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/content-transcript",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "adc9d034-9bb5-47d9-acb1-0fa28429102d",
+      "name": "Approved Transcript Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "70126f42-1b10-414c-a50d-fc094e12cf84",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_INTERNAL_WEBHOOK_CREDENTIAL_ID",
+          "name": "GWB Internal Webhook Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const request=$json; const b=request.body||request; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const transcript=String(b.transcript||'').trim(); return [{json:{schemaVersion:'1.1',eventType:'content.transcript.ready',eventId:String(b.eventId||'transcript:'+$execution.id),correlationId:String(b.correlationId||b.webinarId||$execution.id),occurredAt:b.occurredAt||new Date().toISOString(),sourceSystem:b.sourceSystem||cfg.webinar.provider,subjectKey:b.subjectKey||'',externalRefs:{webinarEventId:String(b.webinarId||cfg.webinar.eventId)},consent:{marketing:false},payload:{title:b.title||'Pourquoi votre acquisition ne scale pas',transcript},_config:cfg,valid:transcript.length>=200}}];"
+      },
+      "id": "373224ec-1aaf-476b-91af-b4347ef4bb5f",
+      "name": "Normalize Transcript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "16a6f180-9768-4896-aa6f-15bd292dbcd7",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "518d5ebd-94c5-426e-8a5f-5664639309ea",
+      "name": "Transcript Long Enough?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:false,error:{code:'transcript_too_short'}} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "bbb3ff64-8ccf-458f-a41e-25e8971b1604",
+      "name": "Reject Short Transcript",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        720,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "9850bdc8-f499-4d04-ac6f-a26b1e18d7a6",
+      "name": "Accept Transcript",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        720,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e=$json; const instructions='À partir de cette transcription, produis uniquement un objet JSON avec une clé assets. Assets doit contenir : 5 posts LinkedIn, 3 scripts vidéo courte, 1 plan d article, 1 email et 8 questions FAQ. Chaque élément contient type, title et body. Ton expert, concret, humain, sans promesse invérifiable. Les contenus sont des brouillons soumis à validation humaine.'; return [{json:{...e,aiRequest:{model:e._config.openai.model,input:[{role:'system',content:[{type:'input_text',text:instructions}]},{role:'user',content:[{type:'input_text',text:e.payload.transcript}]}]}}}];"
+      },
+      "id": "bdbba01c-e486-420a-b7c1-860ee3d1f121",
+      "name": "Prepare Content Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Content Prompt').item.json._config.openai.baseUrl + '/responses' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.aiRequest) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "d37d417f-b456-4de6-a240-12b730b791b5",
+      "name": "Draft Content Assets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        -40
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_OPENAI_CREDENTIAL_ID",
+          "name": "GWB OpenAI API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const source=$('Prepare Content Prompt').item.json; const text=$json.output_text||($json.output||[]).flatMap(o=>o.content||[]).map(c=>c.text||'').join('')||'{}'; const fence=String.fromCharCode(96).repeat(3); let cleaned=text.trim(); if(cleaned.startsWith(fence)){cleaned=cleaned.slice(cleaned.indexOf('\\n')+1); if(cleaned.endsWith(fence)) cleaned=cleaned.slice(0,-3);} let parsed; try{parsed=JSON.parse(cleaned.trim());}catch{parsed={assets:[{type:'review',title:'Réviser la sortie IA',body:text}]};} const assets=Array.isArray(parsed.assets)?parsed.assets:[]; return assets.map((asset,index)=>({json:{...source,eventType:'content.asset.drafted',eventId:source.eventId+':asset:'+index,occurredAt:new Date().toISOString(),sourceSystem:'openai',payload:{sourceEventId:source.eventId,assetType:asset.type||'draft',title:asset.title||'',body:asset.body||'',status:'draft'}}}));"
+      },
+      "id": "2a1880f5-d7d5-4fcd-a752-b3fc099a51a2",
+      "name": "Parse Draft Assets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO gwb_launch.content_assets(source_event_id,asset_type,title,body,status) VALUES($1,$2,$3,$4,'draft') RETURNING id::text;",
+        "options": {
+          "queryReplacement": "={{ [$json.payload.sourceEventId,$json.payload.assetType,$json.payload.title,$json.payload.body] }}"
+        }
+      },
+      "id": "7afbf6d6-2ca0-41ec-af76-f10770bfb2cb",
+      "name": "Store Draft Asset",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1680,
+        -160
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "e6b2a136-bbbd-4e01-896c-fbba00bf2420",
+      "name": "S03 Store Asset Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items=$input.all(); if(items.length===0) return []; const event=items[0].json; return [{json:{...event,notification:{priority:'normal',subject:'[Gary Launch] Nouveaux contenus à valider',html:'<p>'+items.length+' brouillons ont été préparés à partir de la masterclass. Aucun contenu n’est publié automatiquement.</p>'}}}];"
+      },
+      "id": "4ea88a3b-a0e2-4193-a466-14b4ca21b518",
+      "name": "Prepare Content Review Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "ecbc9432-ab65-4e6a-a479-96627f3d1d97",
+      "name": "S05 Notify for Approval",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        40
+      ]
+    }
+  ],
+  "connections": {
+    "Approved Transcript Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Transcript": {
+      "main": [
+        [
+          {
+            "node": "Transcript Long Enough?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcript Long Enough?": {
+      "main": [
+        [
+          {
+            "node": "Accept Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Short Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept Transcript": {
+      "main": [
+        [
+          {
+            "node": "Prepare Content Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Content Prompt": {
+      "main": [
+        [
+          {
+            "node": "Draft Content Assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Content Assets": {
+      "main": [
+        [
+          {
+            "node": "Parse Draft Assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Draft Assets": {
+      "main": [
+        [
+          {
+            "node": "Store Draft Asset",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "S03 Store Asset Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Asset Event": {
+      "main": [
+        [
+          {
+            "node": "Prepare Content Review Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Content Review Alert": {
+      "main": [
+        [
+          {
+            "node": "S05 Notify for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Webinar transcription to review-only content drafts; never auto-publishes.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "d42358cf-db9a-4dab-90ec-7415568faff7"
+}

@@ -1,0 +1,638 @@
+{
+  "id": "gwbW02RegisterV1",
+  "name": "GWB | W02 | Masterclass Registration",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/masterclass-registration",
+        "authentication": "none",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://REPLACE_WITH_SITE_ORIGIN"
+        }
+      },
+      "id": "a6917461-9690-426e-830e-c706f720a063",
+      "name": "Masterclass Registration Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "2615d456-880c-4094-a137-bdd05cf3f376"
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $json;\nconst body = request.body && typeof request.body === 'object' ? request.body : request;\nconst config = {\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}};\nreturn [{ json: { ...body, _request: { headers: request.headers || {}, receivedAt: new Date().toISOString() }, _config: config } }];"
+      },
+      "id": "3ea74180-6942-4857-bd3c-4b0cc77ac1b3",
+      "name": "Extract Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS01ValidateV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "bd0110d6-6d57-44a9-8ccd-f75b82ee9094",
+      "name": "S01 Validate Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        460,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dfdfd920-93e0-4042-89f8-662a1e142d82",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "86355c91-ca51-4632-818b-eef0ac6a4a11",
+      "name": "Valid Registration?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { accepted: false, error: { code: 'invalid_registration', details: $json.validationErrors } } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "6a0cb1a2-84c2-46a4-9495-288738463861",
+      "name": "Reject Invalid Registration",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        940,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS02IdentityV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "88b5930e-327c-4980-a8da-0b6ea0326c0c",
+      "name": "S02 Resolve Identity",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        940,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS04ConsentV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "2f0e025b-be77-4390-803a-94337cb22902",
+      "name": "S04 Consent Guard",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "03bc3a55-a764-4fce-b1af-aa33b676c1f6",
+      "name": "S03 Store Registration",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1420,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fa9dedf5-299f-4597-ba8f-c0555397575c",
+              "leftValue": "={{ $json.ledger?.inserted === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0e985db1-4145-48cb-a529-e92414a47e27",
+      "name": "New Registration?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1660,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { accepted: true, duplicate: true, eventId: $json.eventId } }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "a8ba4ead-a890-49ad-babe-67a3ceef0028",
+      "name": "Accept Duplicate Safely",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1900,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { accepted: true, eventId: $json.eventId, correlationId: $json.correlationId } }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "ff55daa3-dfb2-407a-b1f4-e2855d2bda47",
+      "name": "Accept Registration",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1900,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('S02 Resolve Identity').item.json._config.hubspot.baseUrl + '/crm/v3/objects/contacts/batch/upsert' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ inputs: [{ id: $('S02 Resolve Identity').item.json.normalizedEmail, idProperty: 'email', properties: { email: $('S02 Resolve Identity').item.json.normalizedEmail, firstname: ($('S02 Resolve Identity').item.json.contact?.name || $('S02 Resolve Identity').item.json.registration?.name || '').split(' ')[0] || '', lastname: ($('S02 Resolve Identity').item.json.contact?.name || $('S02 Resolve Identity').item.json.registration?.name || '').split(' ').slice(1).join(' '), company: $('S02 Resolve Identity').item.json.contact?.organisation || $('S02 Resolve Identity').item.json.registration?.organisation || '', [$('S02 Resolve Identity').item.json._config.hubspot.correlationProperty]: $('S02 Resolve Identity').item.json.correlationId, [$('S02 Resolve Identity').item.json._config.hubspot.problemProperty]: $('S02 Resolve Identity').item.json.project?.problem || $('S02 Resolve Identity').item.json.acquisition?.problem || '' } }] }) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "42dbaff0-a6fa-44ce-a390-58495237ce34",
+      "name": "Upsert HubSpot Registrant",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2140,
+        -40
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_HUBSPOT_CREDENTIAL_ID",
+          "name": "GWB HubSpot Private App"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('S02 Resolve Identity').item.json._config.webinar.registrationUrl }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ event_id: $('S02 Resolve Identity').item.json._config.webinar.eventId, name: $('S02 Resolve Identity').item.json.registration.name, email: $('S02 Resolve Identity').item.json.normalizedEmail, correlation_id: $('S02 Resolve Identity').item.json.correlationId }) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "aedf5b26-ec74-4f50-94bf-f878fd0798af",
+      "name": "Register with Webinar Provider",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2380,
+        -40
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_WEBINAR_CREDENTIAL_ID",
+          "name": "GWB Webinar API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $('S02 Resolve Identity').item.json;\nconst provider = $json;\nconst registrantId = provider.id || provider.registrant_id || provider.data?.id || '';\nconst hubspotId = $('Upsert HubSpot Registrant').item.json.results?.[0]?.id || '';\nreturn [{ json: { ...event, eventType: 'masterclass.registration.confirmed', eventId: event.eventId + ':confirmed', occurredAt: new Date().toISOString(), sourceSystem: event._config.webinar.provider, externalRefs: { ...(event.externalRefs || {}), hubspotContactId: hubspotId, webinarRegistrantId: registrantId }, payload: { sourceEventId: event.eventId, webinar: { eventId: event._config.webinar.eventId, startsAt: event._config.webinar.startsAt, joinUrl: provider.join_url || provider.joinUrl || event._config.webinar.joinUrl, replayUrl: event._config.webinar.replayUrl }, hubspotContactId: hubspotId, registrantId } } }];"
+      },
+      "id": "a8f566e8-8e88-4628-b788-9754951cfed1",
+      "name": "Build Confirmation Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2620,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "6912ef38-1081-419f-b17f-a03a48fdfdfc",
+      "name": "S03 Store Confirmation",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2860,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $json;\nconst cfg = event._config;\nconst name = event.registration?.name || 'Bonjour';\nconst esc=(value)=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');\nreturn [{ json: { ...event, delivery: { sender: { name: cfg.brevo.senderName, email: cfg.brevo.senderEmail }, to: [{ name, email: event.normalizedEmail }], subject: 'Inscription confirmée — Pourquoi votre acquisition ne scale pas', htmlContent: '<p>Bonjour ' + esc(name.split(' ')[0]) + ',</p><p>Votre inscription est confirmée.</p><p><strong>Date :</strong> ' + esc(new Date(cfg.webinar.startsAt).toLocaleString('fr-FR', { timeZone: cfg.reporting.timezone })) + '</p><p><a href=\"' + esc(event.payload.webinar.joinUrl || cfg.webinar.joinUrl) + '\">Accéder à la masterclass</a></p><p>Gary</p>' } } }];"
+      },
+      "id": "059f90f9-4eda-4c68-9de7-0151f6b36e94",
+      "name": "Prepare Confirmation Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3100,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Confirmation Email').item.json._config.brevo.baseUrl + '/smtp/email' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.delivery) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "bfa2eb91-493b-4a3e-bce0-9ab5f03e0648",
+      "name": "Send Registration Confirmation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3340,
+        -120
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_BREVO_CREDENTIAL_ID",
+          "name": "GWB Brevo API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbW05IntentV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "dd43ebda-5cbd-4b31-a7de-3a8e3326a8ea",
+      "name": "W05 Score Registration",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        3100,
+        80
+      ]
+    }
+  ],
+  "connections": {
+    "Masterclass Registration Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Request": {
+      "main": [
+        [
+          {
+            "node": "S01 Validate Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S01 Validate Event": {
+      "main": [
+        [
+          {
+            "node": "Valid Registration?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Registration?": {
+      "main": [
+        [
+          {
+            "node": "S02 Resolve Identity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Invalid Registration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S02 Resolve Identity": {
+      "main": [
+        [
+          {
+            "node": "S04 Consent Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S04 Consent Guard": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Registration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Registration": {
+      "main": [
+        [
+          {
+            "node": "New Registration?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Registration?": {
+      "main": [
+        [
+          {
+            "node": "Accept Registration",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Accept Duplicate Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept Registration": {
+      "main": [
+        [
+          {
+            "node": "Upsert HubSpot Registrant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert HubSpot Registrant": {
+      "main": [
+        [
+          {
+            "node": "Register with Webinar Provider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register with Webinar Provider": {
+      "main": [
+        [
+          {
+            "node": "Build Confirmation Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Confirmation Event": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Prepare Confirmation Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "W05 Score Registration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Send Registration Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Registration, attribution, CRM, webinar provider, confirmation and initial score.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "d8f35a18-3821-4aad-a422-433528008438"
+}

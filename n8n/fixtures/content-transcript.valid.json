@@ -1,0 +1,9 @@
+{
+  "eventId": "transcript-demo-0001",
+  "correlationId": "webinar-demo-0001",
+  "webinarId": "webinar-demo-0001",
+  "sourceSystem": "livestorm",
+  "occurredAt": "2026-09-10T19:00:00.000Z",
+  "title": "Pourquoi votre acquisition ne scale pas",
+  "transcript": "Beaucoup d'entreprises pensent manquer de prospects alors que leur système perd déjà une partie de la demande existante. Il faut regarder toute la chaîne : acquisition, page, qualification, suivi commercial et opérations. L'objectif n'est pas d'ajouter des outils, mais de comprendre précisément où la valeur se perd. Une automatisation utile renforce la continuité sans remplacer la conversation humaine. Le diagnostic reste une possibilité intégrée à l'échange, jamais un tunnel imposé."
+}

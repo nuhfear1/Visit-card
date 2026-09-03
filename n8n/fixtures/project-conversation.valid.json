@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.1",
+  "eventType": "project.conversation.submitted",
+  "eventId": "demo-project-0001",
+  "correlationId": "demo-journey-0001",
+  "submittedAt": "2026-09-03T10:00:00.000Z",
+  "locale": "fr",
+  "source": "visit-card",
+  "contact": {
+    "name": "Camille Exemple",
+    "email": "camille@example.com",
+    "organisation": "Entreprise Exemple",
+    "website": "https://example.com"
+  },
+  "project": {
+    "message": "Nous générons des prospects, mais le passage entre le formulaire, la qualification et la relance manque de continuité.",
+    "problem": "conversion"
+  },
+  "diagnostic": {
+    "requested": true,
+    "focus": "conversion",
+    "context": "Le délai de première réponse dépasse parfois deux jours."
+  },
+  "acquisition": {
+    "source": "linkedin",
+    "medium": "organic",
+    "campaign": "gary-launch",
+    "content": "growth-leaks",
+    "term": "",
+    "referrer": "https://www.linkedin.com/",
+    "landingPage": "https://garywilfredborilla.com/fr",
+    "sessionId": "demo-journey-0001",
+    "problem": "conversion"
+  },
+  "consent": {
+    "replyRequested": true,
+    "marketing": false
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "id": "gwbW00ErrorsV1",
+  "name": "GWB | W00 | Error Operations",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "45e232f9-2f3b-4d32-98e5-a36debc65c53",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = {\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}};\nconst input = $json;\nconst raw = JSON.stringify(input);\nconst redacted = raw.replace(/[A-Za-z0-9_-]{28,}/g, '[REDACTED]');\nreturn [{ json: { schemaVersion: '1.1', eventType: 'workflow.failure', eventId: 'failure:' + (input.execution?.id || $execution.id), correlationId: input.execution?.id || $execution.id, occurredAt: new Date().toISOString(), sourceSystem: 'n8n', payload: JSON.parse(redacted), attempt: 1, _config: config } }];"
+      },
+      "id": "27936595-41a4-44b9-967e-d644460bd85a",
+      "name": "Redact Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS06RetryV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b51f3d79-4df4-4e66-938a-0710d87a07e0",
+      "name": "S06 Retry Decision",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $json;\nreturn [{ json: { ...event, notification: { priority: 'urgent', subject: '[Gary Launch] Échec du workflow ' + (event.payload.workflow?.name || 'inconnu'), html: '<h2>Un workflow a échoué</h2><p><strong>Exécution :</strong> ' + (event.payload.execution?.id || 'inconnue') + '</p><p><strong>Dernier nœud :</strong> ' + (event.payload.execution?.lastNodeExecuted || 'inconnu') + '</p><p>Ouvrez n8n pour diagnostiquer et relancer si nécessaire.</p>' } } }];"
+      },
+      "id": "938294f9-e5ae-43f2-aa4e-93be9772e123",
+      "name": "Prepare Incident",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "a1749725-8465-40f6-a461-a5154df9c001",
+      "name": "S05 Notify Gary",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Redact Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redact Failure": {
+      "main": [
+        [
+          {
+            "node": "S06 Retry Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S06 Retry Decision": {
+      "main": [
+        [
+          {
+            "node": "Prepare Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Incident": {
+      "main": [
+        [
+          {
+            "node": "S05 Notify Gary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Global error workflow with redaction, retry classification and alert.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "952676db-61f2-4dca-afa9-ee978eb00dd0"
+}

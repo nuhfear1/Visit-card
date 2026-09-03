@@ -1,0 +1,156 @@
+{
+  "id": "gwbW14ReportV1",
+  "name": "GWB | W14 | Reporting and Data Quality",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "a1114812-e5b0-4a16-81ff-d0a744e4deb2",
+      "name": "Daily Reporting",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = {\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}};\nreturn $input.all().map((item) => ({ json: { ...item.json, _config: config } }));"
+      },
+      "id": "f8b4e515-d5bf-4bb6-8ae8-e217c57a565d",
+      "name": "Load Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH base AS (SELECT event_type,subject_key,occurred_at,payload FROM gwb_launch.events WHERE occurred_at>=now()-interval '30 days'), quality AS (SELECT count(*) FILTER(WHERE subject_key IS NULL) missing_subject,count(*)-count(DISTINCT event_id) duplicate_ids FROM gwb_launch.events WHERE occurred_at>=now()-interval '30 days') SELECT (SELECT count(*) FROM base WHERE event_type='masterclass.registration.submitted') registrations,(SELECT count(*) FROM base WHERE event_type='webinar.attended') attendees,(SELECT count(*) FROM base WHERE event_type='webinar.no_show') no_shows,(SELECT count(*) FROM base WHERE event_type='diagnostic.requested' OR (event_type='project.conversation.submitted' AND payload->'diagnostic'->>'requested'='true')) diagnostics,(SELECT count(*) FROM base WHERE event_type='booking.created') bookings,(SELECT count(*) FROM base WHERE event_type='sales.opportunity.created') opportunities,(SELECT count(*) FROM base WHERE event_type='proposal.sent' OR (event_type='sales.stage.changed' AND lower(payload->>'stage')='contractsent')) proposals,(SELECT count(*) FROM base WHERE event_type='client.won') sales,COALESCE((SELECT sum(NULLIF(payload->>'amount','')::numeric) FROM base WHERE event_type='client.won'),0) revenue,(SELECT missing_subject FROM quality) missing_subject,(SELECT duplicate_ids FROM quality) duplicate_ids,$1::jsonb config;",
+        "options": {
+          "queryReplacement": "={{ [JSON.stringify($json._config)] }}"
+        }
+      },
+      "id": "ca3f3983-b77f-4351-bb62-6673d61adcc3",
+      "name": "Calculate Funnel Metrics",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        460,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const m=$json; const cfg=typeof m.config==='string'?JSON.parse(m.config):m.config; const attendance=m.registrations?Math.round(100*m.attendees/m.registrations):0; const bookingRate=m.attendees?Math.round(100*m.bookings/m.attendees):0; const revenuePerRegistrant=m.registrations?Math.round(Number(m.revenue)*100/Number(m.registrations))/100:0; return [{json:{...m,_config:cfg,notification:{priority:Number(m.missing_subject)>0?'high':'normal',subject:'[Gary Launch] Pilotage 30 jours — '+m.sales+' vente(s)',html:'<h2>Chaîne commerciale — 30 jours</h2><ul><li>Inscriptions : '+m.registrations+'</li><li>Participants : '+m.attendees+' ('+attendance+' %)</li><li>No-show : '+m.no_shows+'</li><li>Diagnostics demandés : '+m.diagnostics+'</li><li>Rendez-vous : '+m.bookings+' ('+bookingRate+' % des participants)</li><li>Opportunités : '+m.opportunities+'</li><li>Propositions : '+m.proposals+'</li><li>Ventes : '+m.sales+'</li><li>Revenu : '+m.revenue+'</li><li>Revenu / inscrit : '+revenuePerRegistrant+'</li></ul><h3>Qualité des données</h3><p>Événements sans subjectKey : '+m.missing_subject+' — doublons : '+m.duplicate_ids+'</p>'}}}];"
+      },
+      "id": "8d3e52fd-e2e1-4374-9e2a-9d1616e0a5ea",
+      "name": "Build Operating Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "89cbf4d3-6486-4306-aec7-d4661d0ff3c3",
+      "name": "S05 Send Report to Gary",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        940,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Daily Reporting": {
+      "main": [
+        [
+          {
+            "node": "Load Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Config": {
+      "main": [
+        [
+          {
+            "node": "Calculate Funnel Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Funnel Metrics": {
+      "main": [
+        [
+          {
+            "node": "Build Operating Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Operating Report": {
+      "main": [
+        [
+          {
+            "node": "S05 Send Report to Gary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Revenue-chain KPIs, attribution-ready ledger quality and daily operating report.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "b031205b-2fab-4a63-9cba-af1136adabce"
+}

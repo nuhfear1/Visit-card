@@ -1,0 +1,139 @@
+{
+  "name": "Gary Wilfred-Borilla launch system",
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-09-03T18:25:00.060Z",
+  "workflowCount": 22,
+  "importOrder": [
+    {
+      "id": "gwbW99SetupV1",
+      "name": "GWB | W99 | One-time Ledger Setup",
+      "file": "workflows/00-w99-ledger-setup.json"
+    },
+    {
+      "id": "gwbS01ValidateV1",
+      "name": "GWB | S01 | Validate and Normalize Event",
+      "file": "workflows/01-s01-validate-event.json"
+    },
+    {
+      "id": "gwbS02IdentityV1",
+      "name": "GWB | S02 | Resolve Identity",
+      "file": "workflows/02-s02-resolve-identity.json"
+    },
+    {
+      "id": "gwbS03LedgerV1",
+      "name": "GWB | S03 | Append Event Ledger",
+      "file": "workflows/03-s03-append-ledger.json"
+    },
+    {
+      "id": "gwbS04ConsentV1",
+      "name": "GWB | S04 | Consent Guard",
+      "file": "workflows/04-s04-consent-guard.json"
+    },
+    {
+      "id": "gwbS05NotifyV1",
+      "name": "GWB | S05 | Notify Gary",
+      "file": "workflows/05-s05-notify-gary.json"
+    },
+    {
+      "id": "gwbS06RetryV1",
+      "name": "GWB | S06 | Error and Retry Decision",
+      "file": "workflows/06-s06-error-retry.json"
+    },
+    {
+      "id": "gwbW00ErrorsV1",
+      "name": "GWB | W00 | Error Operations",
+      "file": "workflows/07-w00-error-operations.json"
+    },
+    {
+      "id": "gwbW01ProjectV1",
+      "name": "GWB | W01 | Project Conversation",
+      "file": "workflows/10-w01-project-conversation.json"
+    },
+    {
+      "id": "gwbW02RegisterV1",
+      "name": "GWB | W02 | Masterclass Registration",
+      "file": "workflows/11-w02-masterclass-registration.json"
+    },
+    {
+      "id": "gwbW03NurtureV1",
+      "name": "GWB | W03 | Webinar Nurture",
+      "file": "workflows/12-w03-webinar-nurture.json"
+    },
+    {
+      "id": "gwbW04AttendanceV1",
+      "name": "GWB | W04 | Engagement and Attendance Sync",
+      "file": "workflows/13-w04-attendance-sync.json"
+    },
+    {
+      "id": "gwbW05IntentV1",
+      "name": "GWB | W05 | Intent Engine",
+      "file": "workflows/14-w05-intent-engine.json"
+    },
+    {
+      "id": "gwbW06FollowupV1",
+      "name": "GWB | W06 | Segmented Webinar Follow-up",
+      "file": "workflows/15-w06-segmented-follow-up.json"
+    },
+    {
+      "id": "gwbW07BookingV1",
+      "name": "GWB | W07 | Diagnostic and Booking",
+      "file": "workflows/16-w07-diagnostic-booking.json"
+    },
+    {
+      "id": "gwbW08PreCallV1",
+      "name": "GWB | W08 | Pre-call Intelligence",
+      "file": "workflows/17-w08-pre-call-intelligence.json"
+    },
+    {
+      "id": "gwbW09PipelineV1",
+      "name": "GWB | W09 | Sales Pipeline",
+      "file": "workflows/18-w09-sales-pipeline.json"
+    },
+    {
+      "id": "gwbW10ProposalV1",
+      "name": "GWB | W10 | Proposal Follow-up",
+      "file": "workflows/19-w10-proposal-follow-up.json"
+    },
+    {
+      "id": "gwbW11ContentV1",
+      "name": "GWB | W11 | Content Factory",
+      "file": "workflows/20-w11-content-factory.json"
+    },
+    {
+      "id": "gwbW12OnboardV1",
+      "name": "GWB | W12 | Client Onboarding",
+      "file": "workflows/21-w12-client-onboarding.json"
+    },
+    {
+      "id": "gwbW13ReferralV1",
+      "name": "GWB | W13 | Testimonial and Referral",
+      "file": "workflows/22-w13-testimonial-referral.json"
+    },
+    {
+      "id": "gwbW14ReportV1",
+      "name": "GWB | W14 | Reporting and Data Quality",
+      "file": "workflows/23-w14-reporting-data-quality.json"
+    }
+  ],
+  "publicWebhooks": {
+    "projectConversation": "/webhook/gwb/project-conversation",
+    "masterclassRegistration": "/webhook/gwb/masterclass-registration",
+    "engagementEvent": "/webhook/gwb/engagement-event"
+  },
+  "authenticatedWebhooks": [
+    "/webhook/gwb/webinar-attendance",
+    "/webhook/gwb/calendar-booking",
+    "/webhook/gwb/hubspot-pipeline",
+    "/webhook/gwb/content-transcript",
+    "/webhook/gwb/client-won",
+    "/webhook/gwb/testimonial-request"
+  ],
+  "credentials": [
+    "GWB Event Ledger Postgres",
+    "GWB HubSpot Private App",
+    "GWB Brevo API",
+    "GWB OpenAI API",
+    "GWB Webinar API",
+    "GWB Internal Webhook Auth"
+  ]
+}

@@ -1,0 +1,502 @@
+{
+  "id": "gwbW09PipelineV1",
+  "name": "GWB | W09 | Sales Pipeline",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/hubspot-pipeline",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e9ac3cab-b917-430b-8748-508069a598cf",
+      "name": "HubSpot Pipeline Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "a9048ef9-87bd-4eb6-a8c1-a8fca7bf8c26",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_INTERNAL_WEBHOOK_CREDENTIAL_ID",
+          "name": "GWB Internal Webhook Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const request=$json; const b=request.body||request; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const dealId=String(b.dealId||b.objectId||b.id||$execution.id); const stage=String(b.stage||b.propertyValue||b.properties?.dealstage||'unknown'); const email=String(b.email||b.contact?.email||'').trim().toLowerCase(); const changeId=String(b.eventId||b.changeId||b.subscriptionId||b.occurredAt||b.occurredAtMs||'current'); return [{json:{schemaVersion:'1.1',eventType:b.eventType==='deal.created'?'sales.opportunity.created':'sales.stage.changed',eventId:'hubspot:deal:'+dealId+':'+stage+':'+changeId,correlationId:b.correlationId||b.properties?.gwb_correlation_id||dealId,occurredAt:b.occurredAt||new Date().toISOString(),sourceSystem:'hubspot',normalizedEmail:email,contact:{name:b.name||b.contact?.name||'',email,organisation:b.company||b.contact?.company||''},externalRefs:{hubspotDealId:dealId,hubspotContactId:String(b.contactId||'')},consent:{replyRequested:true,marketing:false},payload:{dealId,stage,amount:b.amount||b.properties?.amount||'',nextStep:b.nextStep||'',lossReason:b.lossReason||'',contactName:b.name||b.contact?.name||'',company:b.company||b.contact?.company||''},_config:cfg}}];"
+      },
+      "id": "56c4b753-9c5a-4374-9eee-9cf8d3e3db73",
+      "name": "Normalize Sales Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS01ValidateV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "5213585b-d188-42ec-9e59-b5c53eab4c1b",
+      "name": "S01 Validate Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f9de9e8-62e1-4e6f-b9c5-81131b635366",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3c03a9cb-2d78-4771-bfff-ac2cb473fe8d",
+      "name": "Valid Sales Event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:false,error:{code:'invalid_sales_event',details:$json.validationErrors}} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "e3fa032e-c90a-4efd-a997-eb2bda5d9cc8",
+      "name": "Reject Sales Event",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        960,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS02IdentityV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "439c9ebe-03fa-4b28-b53d-c804ef26e47d",
+      "name": "S02 Resolve Identity",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "9831fa10-a457-4e7e-83c5-7ee5a176e6ab",
+      "name": "S03 Store Sales Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c6f60d1f-f437-4cb0-87ab-3354adfee466",
+              "leftValue": "={{ $json.ledger?.inserted === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "825809e8-c95b-44a4-84ef-907f79895a8c",
+      "name": "New Sales Event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,duplicate:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "6bd72766-7f9c-4c2f-b6f4-37b07c579a1b",
+      "name": "Accept Duplicate Safely",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "08c82fb2-ce12-406f-ac48-484206fcf053",
+      "name": "Accept Sales Event",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e=$json; const p=e.payload; const stage=String(p.stage).toLowerCase(); const important=['appointmentscheduled','qualifiedtobuy','presentationscheduled','contractsent','closedwon','closedlost'].includes(stage); return [{json:{...e,notification:important?{priority:stage==='closedwon'?'urgent':'high',subject:'[Gary Launch] Pipeline — '+p.stage,html:'<h2>'+p.stage+'</h2><p>Deal '+p.dealId+'</p><p>Prochaine étape : '+(p.nextStep||'À définir')+'</p><p>Motif de perte : '+(p.lossReason||'—')+'</p>'}:null,needsNotification:important}}];"
+      },
+      "id": "2605087d-53ab-40be-88c8-da6dfdc5f96a",
+      "name": "Define Human Next Step",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f03d9246-89e5-445f-acc0-20239d9cd4ec",
+              "leftValue": "={{ $json.needsNotification }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "436f4590-7704-4b5f-8cff-79e77f1515f5",
+      "name": "Important Stage?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2160,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b74fe2fe-c0f0-4776-a2be-fd046733e5ac",
+      "name": "S05 Notify Gary",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5dd19c96-de32-4461-a582-95a3ff0468cc",
+              "leftValue": "={{ String($json.payload.stage).toLowerCase() === 'contractsent' }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "998cc84d-756b-4c14-9043-e9c0e51385f9",
+      "name": "Proposal Sent?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2160,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO gwb_launch.operations(operation_key,subject_key,operation_type,status,due_at,payload) VALUES($1,$2::uuid,'proposal_followup','pending',now()+interval '2 days',$3::jsonb) ON CONFLICT(operation_key) DO UPDATE SET status='pending',due_at=EXCLUDED.due_at,payload=EXCLUDED.payload,updated_at=now() RETURNING operation_key;",
+        "options": {
+          "queryReplacement": "={{ ['proposal:'+$json.payload.dealId,$json.subjectKey,JSON.stringify({dealId:$json.payload.dealId,contactName:$json.payload.contactName,company:$json.payload.company,sentAt:$json.occurredAt,viewed:false})] }}"
+        }
+      },
+      "id": "6f8faf8d-ffcb-4d23-a55d-90d22a5db2df",
+      "name": "Schedule Proposal Reminder",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2400,
+        80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "HubSpot Pipeline Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Sales Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Sales Event": {
+      "main": [
+        [
+          {
+            "node": "S01 Validate Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S01 Validate Event": {
+      "main": [
+        [
+          {
+            "node": "Valid Sales Event?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Sales Event?": {
+      "main": [
+        [
+          {
+            "node": "S02 Resolve Identity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Sales Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S02 Resolve Identity": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Sales Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Sales Event": {
+      "main": [
+        [
+          {
+            "node": "New Sales Event?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Sales Event?": {
+      "main": [
+        [
+          {
+            "node": "Accept Sales Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Accept Duplicate Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept Sales Event": {
+      "main": [
+        [
+          {
+            "node": "Define Human Next Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Human Next Step": {
+      "main": [
+        [
+          {
+            "node": "Important Stage?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proposal Sent?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Important Stage?": {
+      "main": [
+        [
+          {
+            "node": "S05 Notify Gary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proposal Sent?": {
+      "main": [
+        [
+          {
+            "node": "Schedule Proposal Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "CRM stages, next steps, owner context and loss reasons with selective alerts.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "c98f3637-ebf4-4f63-b568-78977a358f52"
+}

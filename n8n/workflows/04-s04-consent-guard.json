@@ -1,0 +1,59 @@
+{
+  "id": "gwbS04ConsentV1",
+  "name": "GWB | S04 | Consent Guard",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "5cc12b72-6094-41e5-994d-ecc130fcbeb0",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => {\n  const event = item.json;\n  const consent = event.consent || {};\n  const suppressed = Boolean(event.suppressed || event.payload?.suppressed);\n  return { json: { ...event, permissions: { reply: !suppressed && consent.replyRequested === true, operational: !suppressed && (consent.registration === true || consent.replyRequested === true), marketing: !suppressed && consent.marketing === true, suppressed } } };\n});"
+      },
+      "id": "4b908fd3-1e8d-4c59-80f0-8dfb2fb04c19",
+      "name": "Apply Consent Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Apply Consent Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Separate replies, operational messages, marketing and suppression.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "9b400258-9c52-42a4-813e-d1ecb55498eb"
+}

@@ -1,0 +1,235 @@
+{
+  "id": "gwbW08PreCallV1",
+  "name": "GWB | W08 | Pre-call Intelligence",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "b3777d37-b930-4d21-a45c-dd19b531c052",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT s.display_name,s.email_normalized,s.organisation,s.external_refs,COALESCE(jsonb_agg(jsonb_build_object('eventId',e.event_id,'eventType',e.event_type,'occurredAt',e.occurred_at,'payload',e.payload) ORDER BY e.occurred_at),'[]'::jsonb) AS journey,$2::jsonb AS booking_event\nFROM gwb_launch.subjects s LEFT JOIN gwb_launch.events e USING(subject_key) WHERE s.subject_key=$1::uuid GROUP BY s.subject_key;",
+        "options": {
+          "queryReplacement": "={{ [$json.subjectKey,JSON.stringify($json)] }}"
+        }
+      },
+      "id": "380fc4e8-3802-4cf9-af10-9829b91f2a15",
+      "name": "Load Complete Journey",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row=$json; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const journey=typeof row.journey==='string'?JSON.parse(row.journey):row.journey; const booking=typeof row.booking_event==='string'?JSON.parse(row.booking_event):row.booking_event; const instructions=\"Prépare un brief factuel en français pour Gary avant un appel. Résume le contexte déclaré, le problème, les interactions, les signaux d'intention et les questions à éclaircir. Ne pose aucun diagnostic définitif, ne promets aucun résultat et n'invente rien.\"; return [{json:{...booking,_config:cfg,briefRequest:{model:cfg.openai.model,input:[{role:'system',content:[{type:'input_text',text:instructions}]},{role:'user',content:[{type:'input_text',text:JSON.stringify({contact:{name:row.display_name,email:row.email_normalized,organisation:row.organisation},journey})}]}]}}}];"
+      },
+      "id": "c1ad48e5-8d63-4cd5-94fd-886b2f747c94",
+      "name": "Prepare Brief Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Brief Prompt').item.json._config.openai.baseUrl + '/responses' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.briefRequest) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "87fc16a7-9c47-4711-b213-3a18f485a194",
+      "name": "Generate Factual Brief",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_OPENAI_CREDENTIAL_ID",
+          "name": "GWB OpenAI API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const event=$('Prepare Brief Prompt').item.json; const output=$json.output_text||($json.output||[]).flatMap(o=>o.content||[]).map(c=>c.text||'').join('\\n')||'Brief indisponible : consultez le parcours brut.'; const esc=(value)=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;'); return [{json:{...event,brief:output,notification:{priority:'high',subject:'[Gary Launch] Brief pré-appel — '+(event.booking?.name||event.normalizedEmail),html:'<h2>Brief pré-appel</h2><div style=\"white-space:pre-wrap\">'+esc(output)+'</div>'}}}];"
+      },
+      "id": "19e8b3e7-1bbe-4c47-b25a-3ed7d4360e6e",
+      "name": "Parse Human Brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO gwb_launch.call_briefs(subject_key,booking_id,brief,source_event_ids) VALUES($1::uuid,$2,$3,$4::jsonb) RETURNING id::text;",
+        "options": {
+          "queryReplacement": "={{ [$json.subjectKey,$json.booking?.id||'', $json.brief, JSON.stringify([$json.eventId])] }}"
+        }
+      },
+      "id": "65a2c31e-f6b5-42c7-8b83-79a925b83384",
+      "name": "Store Pre-call Brief",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1200,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "7120fa51-60be-40dd-88dd-faa42945252c",
+      "name": "S05 Notify Gary",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Load Complete Journey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Complete Journey": {
+      "main": [
+        [
+          {
+            "node": "Prepare Brief Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Brief Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Factual Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Factual Brief": {
+      "main": [
+        [
+          {
+            "node": "Parse Human Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Human Brief": {
+      "main": [
+        [
+          {
+            "node": "Store Pre-call Brief",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "S05 Notify Gary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Fact-based AI-assisted brief for Gary, never an autonomous diagnosis.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "b9e47509-a419-4a3d-b4f5-ce638fd0eb14"
+}

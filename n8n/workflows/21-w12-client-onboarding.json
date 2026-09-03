@@ -1,0 +1,498 @@
+{
+  "id": "gwbW12OnboardV1",
+  "name": "GWB | W12 | Client Onboarding",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/client-won",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b13b2082-c5a7-4923-b91b-b8403ff290a9",
+      "name": "Deal Won Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "5f63ea73-0ca2-4afd-9207-750bc9f19492",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_INTERNAL_WEBHOOK_CREDENTIAL_ID",
+          "name": "GWB Internal Webhook Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const request=$json; const b=request.body||request; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const dealId=String(b.dealId||b.id||$execution.id); const email=String(b.email||b.contact?.email||'').trim().toLowerCase(); return [{json:{schemaVersion:'1.1',eventType:'client.won',eventId:'client-won:'+dealId,correlationId:b.correlationId||dealId,occurredAt:b.occurredAt||new Date().toISOString(),sourceSystem:'hubspot',normalizedEmail:email,contact:{name:b.name||b.contact?.name||'',email,organisation:b.company||b.contact?.company||''},externalRefs:{hubspotDealId:dealId,hubspotContactId:String(b.contactId||'')},consent:{replyRequested:true,marketing:Boolean(b.marketingConsent)},payload:{dealId,offer:b.offer||'Growth System Sprint',amount:b.amount||'',kickoffTarget:b.kickoffTarget||''},_config:cfg}}];"
+      },
+      "id": "1bd468c9-566b-4c9b-b87d-b41ebd4646a5",
+      "name": "Normalize Won Deal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS01ValidateV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "a13fe64f-f4b0-446c-8c0e-91a69b49b79d",
+      "name": "S01 Validate Client Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "780f5463-ef69-4aab-97d2-a561ab3b6d6e",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ee415a12-2bfa-488b-97d7-bffa281fe64b",
+      "name": "Valid Client Event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:false,error:{code:'invalid_client_event',details:$json.validationErrors}} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "5c9614fc-e48d-4455-bac8-aed7aef00bf8",
+      "name": "Reject Client Event",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        960,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS02IdentityV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "20daf469-c3b0-4548-82a4-036c6747d384",
+      "name": "S02 Resolve Client Identity",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "2e04b2b1-10aa-4e06-9160-435e6090b0f2",
+      "name": "S03 Store Client Won",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "72be2b1e-af78-477a-8d19-827fdf210650",
+              "leftValue": "={{ $json.ledger?.inserted === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c8b25494-468f-4888-8393-109879b5d170",
+      "name": "New Won Deal?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,duplicate:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "c46162c2-4c01-47e3-b2ad-aabd4ac7d007",
+      "name": "Accept Duplicate Safely",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "11a150ed-25f6-4016-a069-c20baf776583",
+      "name": "Accept Won Deal",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e=$json; const cfg=e._config; const onboarding={...e,eventType:'client.onboarding.started',eventId:e.eventId+':onboarding',occurredAt:new Date().toISOString(),sourceSystem:'n8n',payload:{sourceEventId:e.eventId,dealId:e.payload.dealId,checklist:['Contrat et facturation','Accès aux outils','Données et tracking','Objectifs et KPI','Kickoff','Plan des 21 jours'],status:'started'}}; onboarding.delivery={sender:{name:cfg.brevo.senderName,email:cfg.brevo.senderEmail},to:[{name:e.contact.name,email:e.normalizedEmail}],subject:'Bienvenue — préparons le démarrage',htmlContent:'<p>Bonjour '+(e.contact.name||'').split(' ')[0]+',</p><p>Merci pour votre confiance. Je vais vous envoyer les éléments utiles pour préparer le démarrage et garder le kickoff centré sur l’essentiel.</p><p>Gary</p>'}; onboarding.notification={priority:'urgent',subject:'[Gary Launch] Nouveau client — '+(e.contact.organisation||e.contact.name),html:'<h2>Deal gagné</h2><p>'+e.contact.name+' — '+e.contact.organisation+'</p><p>Offre : '+e.payload.offer+'</p><p>Préparer le kickoff et les accès.</p>'}; return [{json:onboarding}];"
+      },
+      "id": "aa1edbbb-b082-4aea-9934-3a7d357e3b8b",
+      "name": "Start Human Onboarding",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "dfa66a34-08d0-4aa0-b658-e670afee636d",
+      "name": "S03 Store Onboarding Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO gwb_launch.operations(operation_key,subject_key,operation_type,status,due_at,payload) VALUES($1,$2::uuid,'client_onboarding','started',now(),$3::jsonb) ON CONFLICT(operation_key) DO UPDATE SET status='started',payload=EXCLUDED.payload,updated_at=now() RETURNING operation_key;",
+        "options": {
+          "queryReplacement": "={{ ['onboarding:'+$json.payload.dealId,$json.subjectKey,JSON.stringify($json.payload)] }}"
+        }
+      },
+      "id": "5d763012-3b67-4c11-be64-997a330d09c4",
+      "name": "Create Onboarding Checklist",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2400,
+        -40
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Start Human Onboarding').item.json._config.brevo.baseUrl + '/smtp/email' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.delivery) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "48e886bb-f20d-490d-b894-e0281050ca90",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        -180
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_BREVO_CREDENTIAL_ID",
+          "name": "GWB Brevo API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "86df906c-500f-4910-85b1-d25f2d1415d7",
+      "name": "S05 Notify Gary",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Deal Won Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Won Deal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Won Deal": {
+      "main": [
+        [
+          {
+            "node": "S01 Validate Client Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S01 Validate Client Event": {
+      "main": [
+        [
+          {
+            "node": "Valid Client Event?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Client Event?": {
+      "main": [
+        [
+          {
+            "node": "S02 Resolve Client Identity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Client Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S02 Resolve Client Identity": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Client Won",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Client Won": {
+      "main": [
+        [
+          {
+            "node": "New Won Deal?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Won Deal?": {
+      "main": [
+        [
+          {
+            "node": "Accept Won Deal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Accept Duplicate Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept Won Deal": {
+      "main": [
+        [
+          {
+            "node": "Start Human Onboarding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Human Onboarding": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Onboarding Event",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "S05 Notify Gary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Onboarding Event": {
+      "main": [
+        [
+          {
+            "node": "Create Onboarding Checklist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Deal won to welcome, access checklist, kickoff preparation and internal alert.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "738b74cd-ed26-4995-a7ad-3da2d2c74b19"
+}

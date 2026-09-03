@@ -1,0 +1,338 @@
+{
+  "id": "gwbW03NurtureV1",
+  "name": "GWB | W03 | Webinar Nurture",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "7ea26d97-ea5d-4c9b-afee-80cfeab63adc",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = {\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}};\nreturn $input.all().map((item) => ({ json: { ...item.json, _config: config } }));"
+      },
+      "id": "5a269979-f6a6-4162-a236-a3f4ed9a437d",
+      "name": "Load Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT e.event_id, e.subject_key::text, s.email_normalized, s.display_name, e.correlation_id, e.payload, e.external_refs, $1::jsonb AS config\nFROM gwb_launch.events e JOIN gwb_launch.subjects s USING(subject_key)\nWHERE e.event_type = 'masterclass.registration.confirmed'\nAND e.occurred_at > now() - interval '60 days';",
+        "options": {
+          "queryReplacement": "={{ [JSON.stringify($json._config)] }}"
+        }
+      },
+      "id": "93e78ef9-36a0-44ef-bb5e-03d7434d362c",
+      "name": "Find Due Reminders",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        460,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = Date.now();\nconst windows = [{ key: '24h', at: 24*60*60*1000, tolerance: 15*60*1000 }, { key: '1h', at: 60*60*1000, tolerance: 15*60*1000 }, { key: '10m', at: 10*60*1000, tolerance: 10*60*1000 }];\nreturn $input.all().flatMap((item) => { const row=item.json; const cfg=typeof row.config==='string'?JSON.parse(row.config):row.config; const payload=typeof row.payload==='string'?JSON.parse(row.payload):row.payload; const startsAt=new Date(payload.webinar?.startsAt || cfg.webinar.startsAt).getTime(); const remaining=startsAt-now; const due=windows.find(w=>remaining<=w.at && remaining>w.at-w.tolerance); if(!due) return []; return [{ json: { schemaVersion:'1.1', eventType:'webinar.reminder.reserved', eventId:'reminder:'+row.event_id+':'+due.key+':reserved', correlationId:row.correlation_id, subjectKey:row.subject_key, occurredAt:new Date().toISOString(), sourceSystem:'n8n', normalizedEmail:row.email_normalized, externalRefs:row.external_refs||{}, consent:{registration:true,marketing:false}, payload:{sourceEventId:row.event_id, name:row.display_name||'', reminder:due.key, startsAt:new Date(startsAt).toISOString(), joinUrl:payload.webinar?.joinUrl||cfg.webinar.joinUrl}, _config:cfg } }]; });"
+      },
+      "id": "5e081a54-8159-4f98-8bac-a63c2b493594",
+      "name": "Select Reminder Window",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "8d35aa5e-ae2c-4cb2-b881-09b0475c53f9",
+      "name": "S03 Reserve Reminder",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        940,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "89167d48-4082-45aa-8435-085c7f380979",
+              "leftValue": "={{ $json.ledger?.inserted === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "20d3e05c-a231-4530-a154-299eb7152c46",
+      "name": "New Reminder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1180,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item=>{const e=item.json; const cfg=e._config; const label=e.payload.reminder==='24h'?'demain':e.payload.reminder==='1h'?'dans une heure':'dans dix minutes'; return {json:{...e,delivery:{sender:{name:cfg.brevo.senderName,email:cfg.brevo.senderEmail},to:[{name:e.payload.name||'',email:e.normalizedEmail}],subject:'La masterclass commence '+label,htmlContent:'<p>La masterclass « Pourquoi votre acquisition ne scale pas » commence '+label+'.</p><p><a href=\"'+e.payload.joinUrl+'\">Rejoindre la session</a></p><p>Gary</p>'}}};});"
+      },
+      "id": "c458ffac-731a-47b3-9552-ca1068d3e1d1",
+      "name": "Prepare Reminder Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Reminder Email').item.json._config.brevo.baseUrl + '/smtp/email' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.delivery) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "ec454b11-b149-42db-9f30-2ad53491dcef",
+      "name": "Send Webinar Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1660,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_BREVO_CREDENTIAL_ID",
+          "name": "GWB Brevo API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const original=$('S03 Reserve Reminder').item.json; const messageId=$json.messageId||$json.message_id||''; return [{json:{...original,eventType:'webinar.reminder.sent',eventId:original.eventId+':sent',occurredAt:new Date().toISOString(),sourceSystem:'brevo',externalRefs:{...(original.externalRefs||{}),brevoMessageId:messageId},payload:{...original.payload,reservationEventId:original.eventId,deliveryStatus:'accepted',brevoMessageId:messageId}}}];"
+      },
+      "id": "056dbcac-9392-418f-990d-7afe7d380208",
+      "name": "Build Reminder Sent Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "d0a0a69f-cf9d-4367-8700-6b6c4b248748",
+      "name": "S03 Store Reminder Sent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2140,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Load Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Config": {
+      "main": [
+        [
+          {
+            "node": "Find Due Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Due Reminders": {
+      "main": [
+        [
+          {
+            "node": "Select Reminder Window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Reminder Window": {
+      "main": [
+        [
+          {
+            "node": "S03 Reserve Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Reserve Reminder": {
+      "main": [
+        [
+          {
+            "node": "New Reminder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Reminder?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Reminder Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Send Webinar Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Webinar Reminder": {
+      "main": [
+        [
+          {
+            "node": "Build Reminder Sent Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Reminder Sent Event": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Reminder Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Idempotent 24h, 1h and 10-minute operational reminders.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "79a2906f-6eba-46eb-b4d7-f7ab53b47993"
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.1",
+  "eventType": "masterclass.registration.submitted",
+  "eventId": "demo-registration-0001",
+  "correlationId": "demo-journey-0001",
+  "submittedAt": "2026-09-03T10:05:00.000Z",
+  "locale": "fr",
+  "source": "visit-card",
+  "registration": {
+    "name": "Camille Exemple",
+    "email": "camille@example.com",
+    "organisation": "Entreprise Exemple"
+  },
+  "acquisition": {
+    "source": "linkedin",
+    "medium": "organic",
+    "campaign": "gary-launch",
+    "content": "growth-leaks",
+    "term": "",
+    "referrer": "https://www.linkedin.com/",
+    "landingPage": "https://garywilfredborilla.com/fr/masterclass",
+    "sessionId": "demo-journey-0001",
+    "problem": "conversion"
+  },
+  "consent": {
+    "registration": true,
+    "marketing": false
+  }
+}

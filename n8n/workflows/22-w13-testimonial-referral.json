@@ -1,0 +1,412 @@
+{
+  "id": "gwbW13ReferralV1",
+  "name": "GWB | W13 | Testimonial and Referral",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/testimonial-request",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "301e8ec6-cbcf-4e6e-9add-bf2c2a824c5c",
+      "name": "Approved Proof Request Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "4a593470-83fc-4c25-ba11-15abdedd53f8",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_INTERNAL_WEBHOOK_CREDENTIAL_ID",
+          "name": "GWB Internal Webhook Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const request=$json; const b=request.body||request; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const approved=b.approved===true; const requestType=b.requestType==='referral'?'referral':'testimonial'; const email=String(b.email||'').trim().toLowerCase(); return [{json:{schemaVersion:'1.1',eventType:requestType==='referral'?'referral.requested':'testimonial.requested',eventId:String(b.eventId||(requestType+'-request:'+(b.clientId||$execution.id))),correlationId:String(b.correlationId||b.clientId||$execution.id),occurredAt:new Date().toISOString(),sourceSystem:'n8n',subjectKey:b.subjectKey||'',normalizedEmail:email,contact:{name:b.name||'',email,organisation:b.company||''},externalRefs:{hubspotContactId:String(b.hubspotContactId||'')},consent:{replyRequested:true,marketing:false},payload:{approved,requestType,result:b.result||'',clientId:b.clientId||''},_config:cfg,approved}}];"
+      },
+      "id": "12e37288-10b6-4e0e-b36b-d8544f58402e",
+      "name": "Normalize Proof Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "df89658d-4d29-4f01-bf21-ca7941e27458",
+              "leftValue": "={{ $json.approved }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "71de0c36-51ad-48f8-bc23-eb9fbce19aea",
+      "name": "Human Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:false,error:{code:'human_approval_required'}} }}",
+        "options": {
+          "responseCode": 409
+        }
+      },
+      "id": "a3578eb2-3ffd-4920-a622-b2ef21f10d20",
+      "name": "Reject Unapproved Request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        720,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS01ValidateV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "426fe1ed-2be1-42ab-8deb-9ed312d00117",
+      "name": "S01 Validate Proof Request",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS02IdentityV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "66364041-2009-4e8f-9911-1d79ef21666e",
+      "name": "S02 Resolve Client Identity",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b033ed73-9ada-4518-828c-dfdf06882972",
+      "name": "S03 Reserve Testimonial Request",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d49cad2-798f-4c49-8291-14bebae0f044",
+              "leftValue": "={{ $json.ledger?.inserted === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c2938a8a-07d0-4e29-9522-aa55653a545a",
+      "name": "New Testimonial Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,duplicate:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "08581b10-096b-48cb-ab46-8658c9b7da06",
+      "name": "Accept Duplicate Safely",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "1eea90c8-c94a-4e64-bff5-69070a44d9fd",
+      "name": "Accept Approved Request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e=$json; const cfg=e._config; const referral=e.payload.requestType==='referral'; const subject=referral?'Une personne à qui cette approche pourrait être utile ?':'Un retour sur notre travail ?'; const body=referral?'<p>Si une personne de votre réseau rencontre un blocage comparable, une mise en relation simple me serait très utile. Seulement si cela vous paraît pertinent.</p>':'<p>Maintenant que nous avons du recul sur le projet, votre retour m’aiderait beaucoup. Quelques lignes sincères sur la situation de départ, le travail réalisé et ce qui a changé suffisent.</p><p>Si vous préférez, vous pouvez simplement répondre à cet email.</p>'; return [{json:{...e,delivery:{sender:{name:cfg.brevo.senderName,email:cfg.brevo.senderEmail},to:[{name:e.contact.name,email:e.normalizedEmail}],subject,htmlContent:'<p>Bonjour '+(e.contact.name||'').split(' ')[0]+',</p>'+body+'<p>Gary</p>'}}}];"
+      },
+      "id": "7754c936-3601-4a2a-bdfa-0ed07a0e8ddb",
+      "name": "Prepare Testimonial Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Testimonial Email').item.json._config.brevo.baseUrl + '/smtp/email' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.delivery) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "1c40801c-c281-4017-96e1-f91f687c23a6",
+      "name": "Send Testimonial Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        -40
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_BREVO_CREDENTIAL_ID",
+          "name": "GWB Brevo API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    }
+  ],
+  "connections": {
+    "Approved Proof Request Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Proof Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Proof Request": {
+      "main": [
+        [
+          {
+            "node": "Human Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Approved?": {
+      "main": [
+        [
+          {
+            "node": "S01 Validate Proof Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Unapproved Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S01 Validate Proof Request": {
+      "main": [
+        [
+          {
+            "node": "S02 Resolve Client Identity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S02 Resolve Client Identity": {
+      "main": [
+        [
+          {
+            "node": "S03 Reserve Testimonial Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Reserve Testimonial Request": {
+      "main": [
+        [
+          {
+            "node": "New Testimonial Request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Testimonial Request?": {
+      "main": [
+        [
+          {
+            "node": "Accept Approved Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Accept Duplicate Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept Approved Request": {
+      "main": [
+        [
+          {
+            "node": "Prepare Testimonial Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Testimonial Email": {
+      "main": [
+        [
+          {
+            "node": "Send Testimonial Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Human-approved testimonial request after a real delivery result.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "ad93975f-ea7a-4842-94b9-9d3dc1ddd70e"
+}

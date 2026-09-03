@@ -1,0 +1,444 @@
+{
+  "id": "gwbW07BookingV1",
+  "name": "GWB | W07 | Diagnostic and Booking",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gwb/calendar-booking",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "50ffc5eb-2b5e-4609-82e7-37113245b3e4",
+      "name": "Calendar Booking Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "d62bd865-3304-4633-96a1-608e487ee273",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_INTERNAL_WEBHOOK_CREDENTIAL_ID",
+          "name": "GWB Internal Webhook Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const request=$json; const b=request.body||request; const cfg={\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}}; const id=String(b.id||b.uid||b.bookingId||$execution.id); const status=String(b.status||b.triggerEvent||'created').toLowerCase(); const type=status.includes('cancel')?'booking.cancelled':status.includes('complete')?'booking.completed':'booking.created'; const email=String(b.email||b.attendee?.email||b.responses?.email||'').trim().toLowerCase(); return [{json:{schemaVersion:'1.1',eventType:type,eventId:'booking:'+id+':'+type.split('.')[1],correlationId:b.correlationId||b.metadata?.correlationId||id,occurredAt:b.startTime||b.occurredAt||new Date().toISOString(),sourceSystem:cfg.calendar.provider,booking:{id,name:b.name||b.attendee?.name||'',email,startTime:b.startTime||b.start,timezone:b.timezone||'',notes:b.notes||''},normalizedEmail:email,externalRefs:{calendarBookingId:id},consent:{replyRequested:true,marketing:false},payload:b,_config:cfg}}];"
+      },
+      "id": "75f75e04-3fce-48a6-996c-2482360a63a3",
+      "name": "Normalize Booking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS01ValidateV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "3cbfc94c-8866-49a6-beb2-7882c426b3ac",
+      "name": "S01 Validate Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d324f374-a0e0-4538-9e41-e6db761c9dd1",
+              "leftValue": "={{ $json.valid }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f88e59a5-dbf5-4524-a99b-412068442c28",
+      "name": "Valid Booking?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:false,error:{code:'invalid_booking',details:$json.validationErrors}} }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "47fc5bb2-693b-4a9b-aa76-f55d61d477fa",
+      "name": "Reject Booking",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        960,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS02IdentityV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "23a637bb-3777-4b97-9159-945b6744440e",
+      "name": "S02 Resolve Identity",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS03LedgerV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "836c9501-b218-46fa-aaae-c7e860d989a5",
+      "name": "S03 Store Booking",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a731a10d-d290-4ce0-88d4-b3b29a7f4f8b",
+              "leftValue": "={{ $json.ledger?.inserted === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d74d4fd3-fc8d-4566-8995-c7dadd30c0e6",
+      "name": "New Booking Event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,duplicate:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "a2ee927e-047b-4666-8a13-69df8692c57e",
+      "name": "Accept Duplicate Safely",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {accepted:true,eventId:$json.eventId} }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "d84dc32c-4824-498d-8f69-80ef58fb9b4d",
+      "name": "Accept Booking",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e=$json; return [{json:{...e,notification:{priority:e.eventType==='booking.created'?'high':'normal',subject:'[Gary Launch] '+e.eventType+' — '+(e.booking?.name||e.normalizedEmail),html:'<h2>'+e.eventType+'</h2><p>'+e.booking?.name+'</p><p>'+e.normalizedEmail+'</p><p>'+e.booking?.startTime+'</p><p>'+e.booking?.notes+'</p>'}}}];"
+      },
+      "id": "5dff0431-6c9e-4f6d-b84a-43242e7508eb",
+      "name": "Prepare Booking Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "660cd7a9-d3b4-4d04-b6a1-d5eae8d13ad9",
+      "name": "S05 Notify Gary",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbW05IntentV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "69ad0a4b-fb5b-4ccf-8b4d-2e49f3aa3b3a",
+      "name": "W05 Recalculate Intent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbW08PreCallV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "72f13eef-77d7-49a7-8adf-62c933b7e5bf",
+      "name": "W08 Build Pre-call Brief",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        40
+      ]
+    }
+  ],
+  "connections": {
+    "Calendar Booking Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Booking": {
+      "main": [
+        [
+          {
+            "node": "S01 Validate Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S01 Validate Event": {
+      "main": [
+        [
+          {
+            "node": "Valid Booking?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Booking?": {
+      "main": [
+        [
+          {
+            "node": "S02 Resolve Identity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S02 Resolve Identity": {
+      "main": [
+        [
+          {
+            "node": "S03 Store Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S03 Store Booking": {
+      "main": [
+        [
+          {
+            "node": "New Booking Event?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Booking Event?": {
+      "main": [
+        [
+          {
+            "node": "Accept Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Accept Duplicate Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accept Booking": {
+      "main": [
+        [
+          {
+            "node": "Prepare Booking Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Booking Alert": {
+      "main": [
+        [
+          {
+            "node": "S05 Notify Gary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "W05 Recalculate Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "W05 Recalculate Intent": {
+      "main": [
+        [
+          {
+            "node": "W08 Build Pre-call Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Booking lifecycle associated with the optional diagnostic and canonical journey.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "da79a903-9114-48e1-84c5-7650d47c6220"
+}
