@@ -36,6 +36,10 @@ jobs:
 
       - name: Construire le site
         run: npm run build
+        env:
+          NEXT_PUBLIC_PROJECT_CONVERSATION_ENDPOINT: ${{ vars.NEXT_PUBLIC_PROJECT_CONVERSATION_ENDPOINT }}
+          NEXT_PUBLIC_MASTERCLASS_REGISTRATION_ENDPOINT: ${{ vars.NEXT_PUBLIC_MASTERCLASS_REGISTRATION_ENDPOINT }}
+          NEXT_PUBLIC_FUNNEL_EVENT_ENDPOINT: ${{ vars.NEXT_PUBLIC_FUNNEL_EVENT_ENDPOINT }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

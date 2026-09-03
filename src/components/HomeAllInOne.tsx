@@ -6,6 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import Hero from "@/components/Hero";
 import { usePageTransition } from "@/components/PageTransition";
 import { localizedPath, type Locale } from "@/lib/i18n";
+import { PROJECT_PROBLEM_KEYS, rememberProjectProblem } from "@/lib/funnel";
 
 type Problem = {
   title: string;
@@ -235,7 +236,13 @@ export default function HomeAllInOne({ locale = "fr" }: { locale?: Locale }) {
   const { startTransition } = usePageTransition();
   const isRtl = locale === "ar";
   const selected = c.problems[active];
-  const contactHref = localizedPath(locale, "/contact");
+  const selectedProblem = PROJECT_PROBLEM_KEYS[active];
+  const contactHref = `${localizedPath(locale, "/contact")}?problem=${selectedProblem}`;
+
+  const selectProblem = (index: number, remember = false) => {
+    setActive(index);
+    if (remember) rememberProjectProblem(PROJECT_PROBLEM_KEYS[index]);
+  };
 
   const nav = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault();
@@ -261,7 +268,7 @@ export default function HomeAllInOne({ locale = "fr" }: { locale?: Locale }) {
               {c.problems.map((problem, index) => {
                 const isActive = index === active;
                 return (
-                  <button key={problem.title} type="button" onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)} className={`group flex w-full items-center justify-between border-b border-[#161616]/15 px-0 py-5 text-left transition last:border-b-0 md:py-6 ${isActive ? "text-[#F44A22]" : "text-[#161616] hover:text-[#F44A22]"}`}>
+                  <button key={problem.title} type="button" aria-pressed={isActive} aria-controls="problem-detail" onMouseEnter={() => selectProblem(index)} onFocus={() => selectProblem(index, true)} onClick={() => selectProblem(index, true)} className={`group flex w-full items-center justify-between border-b border-[#161616]/15 px-0 py-5 text-left transition last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F44A22] md:py-6 ${isActive ? "text-[#F44A22]" : "text-[#161616] hover:text-[#F44A22]"}`}>
                     <span className="flex items-center gap-4">
                       <span className="font-oswald text-xs font-bold text-[#161616]/25">0{index + 1}</span>
                       <span className="font-oswald text-[7vw] font-black uppercase leading-[0.9] tracking-[-0.04em] sm:text-4xl md:text-5xl lg:text-[3.1vw]">{problem.title}</span>
@@ -272,7 +279,7 @@ export default function HomeAllInOne({ locale = "fr" }: { locale?: Locale }) {
               })}
             </div>
 
-            <div className="relative min-h-[540px] overflow-hidden px-0 py-8 md:min-h-[590px] md:py-10 lg:px-10 lg:py-12">
+            <div id="problem-detail" aria-live="polite" className="relative min-h-[540px] overflow-hidden px-0 py-8 md:min-h-[590px] md:py-10 lg:px-10 lg:py-12">
               <div className="pointer-events-none absolute right-0 top-1/2 h-[360px] w-[360px] -translate-y-1/2 rounded-full border border-[#F44A22]/20" />
               <div className="relative z-10 flex h-full flex-col justify-between gap-10">
                 <div>
