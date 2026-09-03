@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.1",
+  "eventType": "project.conversation.submitted",
+  "eventId": "demo-invalid-0001",
+  "correlationId": "demo-journey-invalid",
+  "submittedAt": "2026-09-03T10:00:00.000Z",
+  "source": "visit-card",
+  "contact": {
+    "name": "",
+    "email": "adresse-invalide"
+  },
+  "project": {
+    "message": "Trop court",
+    "problem": "conversion"
+  },
+  "diagnostic": {
+    "requested": false,
+    "focus": "",
+    "context": ""
+  },
+  "consent": {
+    "replyRequested": true,
+    "marketing": false
+  }
+}

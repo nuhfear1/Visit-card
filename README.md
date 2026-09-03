@@ -28,4 +28,4 @@ Set the relevant `NEXT_PUBLIC_N8N_*_WEBHOOK_URL` values in `.env.local` or as Gi
 
 Later, setting `NEXT_PUBLIC_API_BASE_URL` moves public ingestion to the backend. The backend then delegates orchestration to n8n while the frontend payload and visitor experience remain unchanged. When both are configured, the backend takes priority.
 
-The complete launch automation is documented in `docs/n8n-launch-system.md`. Future backend architecture and API contracts remain documented in `docs/backend-architecture.md` and `docs/openapi.yaml`.
+The complete launch automation is available as an importable 22-workflow pack in `n8n/README.md` and documented functionally in `docs/n8n-launch-system.md`. Future backend architecture and API contracts remain documented in `docs/backend-architecture.md` and `docs/openapi.yaml`.

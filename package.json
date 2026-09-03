@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "n8n:generate": "node scripts/generate-n8n-gary-launch.mjs",
+    "n8n:validate": "node scripts/validate-n8n-workflows.mjs",
+    "n8n:test": "node scripts/generate-n8n-gary-launch.mjs && node scripts/validate-n8n-workflows.mjs && node scripts/test-n8n-workflows.mjs"
   },
   "dependencies": {
     "@formspree/react": "^3.0.0",

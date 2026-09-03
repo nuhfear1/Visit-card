@@ -1,0 +1,13 @@
+{
+  "eventId": "hubspot-change-demo-0001",
+  "eventType": "deal.created",
+  "dealId": "deal-demo-0001",
+  "contactId": "contact-demo-0001",
+  "correlationId": "demo-journey-0001",
+  "occurredAt": "2026-09-12T15:00:00.000Z",
+  "email": "camille@example.com",
+  "stage": "appointmentscheduled",
+  "amount": "5000",
+  "nextStep": "Préparer la conversation projet",
+  "lossReason": ""
+}

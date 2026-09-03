@@ -1,0 +1,89 @@
+{
+  "id": "gwbW99SetupV1",
+  "name": "GWB | W99 | One-time Ledger Setup",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a85058a7-526d-4160-833c-9096c57b736b",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\nCREATE EXTENSION IF NOT EXISTS pgcrypto;\nCREATE SCHEMA IF NOT EXISTS gwb_launch;\nCREATE TABLE IF NOT EXISTS gwb_launch.subjects (\n  subject_key uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n  email_normalized text NOT NULL UNIQUE,\n  display_name text,\n  organisation text,\n  external_refs jsonb NOT NULL DEFAULT '{}'::jsonb,\n  created_at timestamptz NOT NULL DEFAULT now(),\n  last_seen_at timestamptz NOT NULL DEFAULT now()\n);\nCREATE TABLE IF NOT EXISTS gwb_launch.events (\n  event_id text PRIMARY KEY,\n  correlation_id text NOT NULL,\n  subject_key uuid REFERENCES gwb_launch.subjects(subject_key),\n  event_type text NOT NULL,\n  schema_version text NOT NULL,\n  source_system text NOT NULL,\n  occurred_at timestamptz NOT NULL,\n  consent jsonb NOT NULL DEFAULT '{}'::jsonb,\n  external_refs jsonb NOT NULL DEFAULT '{}'::jsonb,\n  payload jsonb NOT NULL,\n  n8n_execution_id text,\n  created_at timestamptz NOT NULL DEFAULT now()\n);\nCREATE INDEX IF NOT EXISTS gwb_events_subject_time_idx ON gwb_launch.events(subject_key, occurred_at DESC);\nCREATE INDEX IF NOT EXISTS gwb_events_type_time_idx ON gwb_launch.events(event_type, occurred_at DESC);\nCREATE INDEX IF NOT EXISTS gwb_events_correlation_idx ON gwb_launch.events(correlation_id);\nCREATE TABLE IF NOT EXISTS gwb_launch.call_briefs (\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), subject_key uuid NOT NULL REFERENCES gwb_launch.subjects(subject_key),\n  booking_id text, brief text NOT NULL, source_event_ids jsonb NOT NULL DEFAULT '[]'::jsonb,\n  created_at timestamptz NOT NULL DEFAULT now()\n);\nCREATE TABLE IF NOT EXISTS gwb_launch.content_assets (\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), source_event_id text NOT NULL, asset_type text NOT NULL,\n  title text, body text NOT NULL, status text NOT NULL DEFAULT 'draft', created_at timestamptz NOT NULL DEFAULT now()\n);\nCREATE TABLE IF NOT EXISTS gwb_launch.operations (\n  operation_key text PRIMARY KEY, subject_key uuid, operation_type text NOT NULL, status text NOT NULL,\n  due_at timestamptz, payload jsonb NOT NULL DEFAULT '{}'::jsonb, updated_at timestamptz NOT NULL DEFAULT now()\n);",
+        "options": {}
+      },
+      "id": "c5fc4d68-a964-4cd7-8d66-4ec0f24877a9",
+      "name": "Create Gary Launch Schema",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { ready: true, schema: 'gwb_launch', completedAt: new Date().toISOString() } }];"
+      },
+      "id": "ef7e41f7-82b4-4162-87f9-90177d8fbac7",
+      "name": "Setup Complete",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create Gary Launch Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Gary Launch Schema": {
+      "main": [
+        [
+          {
+            "node": "Setup Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Run once before activating the launch workflows.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "0df64c76-62e4-4953-b7e5-e71852f08c26"
+}

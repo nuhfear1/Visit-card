@@ -10,6 +10,18 @@ The proof is not traffic or impressions. It is a traceable chain:
 visitor -> registration -> attendance -> intent -> conversation -> opportunity -> sale -> case study
 ```
 
+## Importable implementation
+
+The repository now contains the complete generated pack:
+
+- `n8n/gary-launch.bundle.json` for CLI import;
+- `n8n/workflows/*.json` for individual UI import;
+- `n8n/manifest.json` for dependency order and endpoints;
+- `n8n/fixtures/*.json` for safe acceptance tests;
+- `n8n/README.md` for credentials, provider mapping and activation.
+
+The 22 workflows contain 185 connected nodes and import inactive. Provider credentials and signed-callback verification remain environment-specific and are bound in n8n, never committed to Git.
+
 ## Architecture by phase
 
 ### Phase 1 — launch and proof
@@ -113,7 +125,7 @@ Shared workflows must have explicit input fields, versioned outputs and no publi
 | W01 — Project Conversation | Visit-card webhook | Validate, deduplicate, resolve identity, ledger, CRM upsert, notify Gary | Qualified conversation record |
 | W02 — Masterclass Registration | Visit-card or webinar webhook | Register, capture source/UTM/consent, CRM upsert, ledger | Confirmed registration |
 | W03 — Webinar Nurture | Registration or schedule | Confirmation, reminders, calendar link, timezone-safe timing | Attendance-ready registrant |
-| W04 — Attendance Sync | Webinar callback or scheduled import | Attendance, duration, polls, questions, CTA clicks, no-show state | Normalized engagement events |
+| W04 — Engagement & Attendance Sync | Webinar callback or Visit-card event | Attendance, duration, polls, questions, CTA clicks, replay and no-show state | Normalized engagement events |
 | W05 — Intent Engine | New engagement event | Recalculate explainable score and temperature | Cold, warm, sales-ready or priority |
 | W06 — Segmented Follow-up | Webinar end plus score | Participant, no-show, replay and high-intent branches | Relevant follow-up sequence |
 | W07 — Diagnostic & Booking | Diagnostic request or calendar callback | Qualification, booking, CRM association and preparation status | Booked or nurtured lead |
@@ -140,9 +152,12 @@ webinar.attended
 webinar.no_show
 webinar.poll_answered
 webinar.cta_clicked
+webinar.reminder.reserved
+webinar.reminder.sent
+booking.clicked
 replay.started
 replay.completed
-intent.score_changed
+intent.score.changed
 diagnostic.requested
 booking.created
 booking.completed
@@ -159,6 +174,7 @@ content.asset.drafted
 content.asset.approved
 testimonial.requested
 testimonial.received
+referral.requested
 referral.received
 ```
 

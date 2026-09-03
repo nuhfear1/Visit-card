@@ -1,0 +1,25 @@
+{
+  "id": "attendance-demo-0001",
+  "correlationId": "demo-journey-0001",
+  "occurredAt": "2026-09-10T18:00:00.000Z",
+  "name": "Camille Exemple",
+  "email": "camille@example.com",
+  "durationMinutes": 46,
+  "attended": true,
+  "registrantId": "registrant-demo-0001",
+  "polls": [
+    {
+      "question": "Où perdez-vous le plus de prospects ?",
+      "answer": "Follow-up"
+    },
+    {
+      "question": "Le problème doit-il être réglé sous 90 jours ?",
+      "answer": "Oui"
+    }
+  ],
+  "questions": [
+    "Comment relier le CRM aux relances sans perdre l'approche humaine ?"
+  ],
+  "ctaClicked": true,
+  "marketingConsent": false
+}

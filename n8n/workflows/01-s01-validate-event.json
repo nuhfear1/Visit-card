@@ -1,0 +1,59 @@
+{
+  "id": "gwbS01ValidateV1",
+  "name": "GWB | S01 | Validate and Normalize Event",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "0e813982-4494-43e5-81f0-b54d849105df",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst allowed = new Set([\n  'project.conversation.submitted','masterclass.registration.submitted','masterclass.registration.confirmed',\n  'crm.contact.upserted','email.transactional.sent','email.delivered','email.clicked',\n  'webinar.attended','webinar.no_show','webinar.poll_answered','webinar.cta_clicked','booking.clicked',\n  'replay.started','replay.completed','intent.score.changed','diagnostic.requested',\n  'booking.created','booking.completed','booking.cancelled','sales.opportunity.created',\n  'sales.stage.changed','proposal.sent','proposal.viewed','proposal.accepted','proposal.declined',\n  'client.won','client.onboarding.started','content.asset.drafted','content.asset.approved',\n  'content.transcript.ready','testimonial.requested','testimonial.received','referral.requested','referral.received',\n  'webinar.reminder.reserved','webinar.reminder.sent','case.study.viewed'\n]);\nreturn $input.all().map((item) => {\n  const event = { ...item.json };\n  const errors = [];\n  const email = event.normalizedEmail || event.contact?.email || event.registration?.email || event.attendee?.email || event.booking?.email || event.payload?.email || '';\n  if (event.schemaVersion !== '1.1') errors.push('schemaVersion must be 1.1');\n  if (!allowed.has(event.eventType)) errors.push('eventType is not allowed');\n  if (!event.eventId || String(event.eventId).length < 8) errors.push('eventId is required');\n  if (!event.correlationId || String(event.correlationId).length < 8) errors.push('correlationId is required');\n  if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(String(email).trim())) errors.push('email is invalid');\n  if (event.eventType === 'project.conversation.submitted') {\n    if (!event.contact?.name || !event.contact?.email) errors.push('contact name and email are required');\n    if (!event.project?.message || event.project.message.length < 20 || event.project.message.length > 4000) errors.push('project message length is invalid');\n  }\n  if (event.eventType === 'masterclass.registration.submitted' && (!event.registration?.name || !event.registration?.email)) errors.push('registration name and email are required');\n  const identityEvents = new Set(['webinar.attended','webinar.no_show','booking.created','booking.completed','booking.cancelled','sales.opportunity.created','sales.stage.changed','client.won','testimonial.requested','referral.requested']);\n  if (identityEvents.has(event.eventType) && !email) errors.push('email is required for identity resolution');\n  const occurredAt = event.occurredAt || event.submittedAt || event._request?.receivedAt || new Date().toISOString();\n  return { json: {\n    ...event,\n    occurredAt,\n    sourceSystem: event.sourceSystem || event.source || 'unknown',\n    externalRefs: event.externalRefs || {},\n    payload: event.payload || Object.fromEntries(Object.entries(event).filter(([key]) => !key.startsWith('_'))),\n    normalizedEmail: String(email).trim().toLowerCase(),\n    valid: errors.length === 0,\n    validationErrors: errors\n  } };\n});"
+      },
+      "id": "0460b406-bbfa-420f-a2ac-86edefb9b32a",
+      "name": "Validate and Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Validate and Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Allowlist, schema and normalization boundary for every event.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "f8fc87e3-0d13-4e26-a99d-a65291d7d80c"
+}

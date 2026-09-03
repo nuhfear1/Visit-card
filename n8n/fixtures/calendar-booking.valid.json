@@ -1,0 +1,10 @@
+{
+  "id": "booking-demo-0001",
+  "status": "created",
+  "correlationId": "demo-journey-0001",
+  "name": "Camille Exemple",
+  "email": "camille@example.com",
+  "startTime": "2026-09-12T14:00:00.000Z",
+  "timezone": "Europe/Paris",
+  "notes": "Échanger sur la continuité entre acquisition, CRM et relances."
+}

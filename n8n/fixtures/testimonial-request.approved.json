@@ -1,0 +1,11 @@
+{
+  "eventId": "testimonial-request-demo-0001",
+  "correlationId": "demo-journey-0001",
+  "clientId": "client-demo-0001",
+  "hubspotContactId": "contact-demo-0001",
+  "approved": true,
+  "name": "Camille Exemple",
+  "email": "camille@example.com",
+  "company": "Entreprise Exemple",
+  "result": "Le délai de première réponse est passé de deux jours à moins de deux heures."
+}

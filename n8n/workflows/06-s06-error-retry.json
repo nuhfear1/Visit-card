@@ -1,0 +1,59 @@
+{
+  "id": "gwbS06RetryV1",
+  "name": "GWB | S06 | Error and Retry Decision",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "f01b5712-1271-4b09-8d72-4a7085fea8ad",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => {\n  const input = item.json;\n  const status = Number(input.httpCode || input.statusCode || input.error?.httpCode || 0);\n  const retryable = status === 0 || status === 408 || status === 409 || status === 425 || status === 429 || status >= 500;\n  const attempt = Number(input.attempt || 1);\n  const delaySeconds = retryable ? Math.min(3600, Math.round(30 * Math.pow(2, Math.max(0, attempt - 1)))) : 0;\n  return { json: { ...input, retryDecision: retryable && attempt < 6 ? 'retry' : retryable ? 'quarantine' : 'permanent_failure', retryable, nextAttempt: attempt + 1, delaySeconds } };\n});"
+      },
+      "id": "f1414d23-d036-4e5e-8c67-b041754fc262",
+      "name": "Classify Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Classify Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Retryable, permanent and quarantine classification.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "5cadea6e-8d81-4098-ba32-51005900a85f"
+}

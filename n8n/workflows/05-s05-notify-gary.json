@@ -1,0 +1,117 @@
+{
+  "id": "gwbS05NotifyV1",
+  "name": "GWB | S05 | Notify Gary",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "92b1f788-9992-4ed4-aeca-0befc499c850",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => {\n  const event = item.json;\n  const cfg = event._config || {\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}};\n  const note = event.notification || {};\n  const subject = note.subject || '[Gary Launch] Action requise';\n  const details = note.html || '<p>Un événement nécessite votre attention.</p><pre>' + JSON.stringify({ eventType: event.eventType, eventId: event.eventId, correlationId: event.correlationId, subjectKey: event.subjectKey, priority: note.priority || 'normal' }, null, 2) + '</pre>';\n  return { json: { ...event, delivery: { sender: { name: cfg.brevo.senderName, email: cfg.brevo.senderEmail }, to: [{ name: cfg.site.brandName, email: cfg.site.garyEmail }], subject, htmlContent: details } } };\n});"
+      },
+      "id": "4efd09cf-7ca9-44c7-bd20-8ba903fc49b7",
+      "name": "Prepare Human Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Human Notification').item.json._config.brevo.baseUrl + '/smtp/email' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.delivery) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "f59d0744-a330-44e0-8754-8515eb333c8e",
+      "name": "Notify Gary via Brevo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GWB_BREVO_CREDENTIAL_ID",
+          "name": "GWB Brevo API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Prepare Human Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Human Notification": {
+      "main": [
+        [
+          {
+            "node": "Notify Gary via Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Standard human escalation without autonomous diagnosis.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "e341fb50-8450-44cf-95dd-2cc6a66f4d05"
+}

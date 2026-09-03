@@ -1,0 +1,190 @@
+{
+  "id": "gwbW10ProposalV1",
+  "name": "GWB | W10 | Proposal Follow-up",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "9a7824d8-fece-4fcf-b1b4-d70e73be9463",
+      "name": "Every Weekday Morning",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = {\"site\":{\"baseUrl\":\"https://REPLACE_WITH_SITE_URL\",\"allowedOrigins\":\"https://REPLACE_WITH_SITE_ORIGIN\",\"brandName\":\"Gary Wilfred-Borilla\",\"garyEmail\":\"REPLACE_WITH_GARY_EMAIL\"},\"hubspot\":{\"baseUrl\":\"https://api.hubapi.com\",\"scoreProperty\":\"gwb_intent_score\",\"temperatureProperty\":\"gwb_intent_temperature\",\"correlationProperty\":\"gwb_correlation_id\",\"problemProperty\":\"gwb_primary_problem\"},\"brevo\":{\"baseUrl\":\"https://api.brevo.com/v3\",\"senderName\":\"Gary Wilfred-Borilla\",\"senderEmail\":\"REPLACE_WITH_VERIFIED_SENDER_EMAIL\"},\"webinar\":{\"provider\":\"REPLACE_WITH_LIVESTORM_OR_ZOOM\",\"registrationUrl\":\"https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations\",\"eventId\":\"REPLACE_WITH_WEBINAR_EVENT_ID\",\"startsAt\":\"2026-10-15T18:00:00.000Z\",\"joinUrl\":\"https://REPLACE_WITH_WEBINAR_JOIN_URL\",\"replayUrl\":\"https://REPLACE_WITH_REPLAY_URL\"},\"calendar\":{\"provider\":\"cal.com\",\"bookingUrl\":\"https://cal.com/REPLACE_WITH_GARY/diagnostic\"},\"openai\":{\"baseUrl\":\"https://api.openai.com/v1\",\"model\":\"gpt-5-mini\"},\"reporting\":{\"timezone\":\"America/Guadeloupe\",\"dailyHour\":8,\"weeklyDay\":\"monday\"}};\nreturn $input.all().map((item) => ({ json: { ...item.json, _config: config } }));"
+      },
+      "id": "5521bfef-ea71-460f-9bb3-142767e14efd",
+      "name": "Load Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT operation_key,subject_key::text,status,due_at,payload,$1::jsonb AS config FROM gwb_launch.operations WHERE operation_type='proposal_followup' AND status='pending' AND due_at<=now() ORDER BY due_at LIMIT 100;",
+        "options": {
+          "queryReplacement": "={{ [JSON.stringify($json._config)] }}"
+        }
+      },
+      "id": "c9c4e3ec-fa83-4577-91bf-158f48c5c640",
+      "name": "Find Proposal Follow-ups",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        460,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item=>{const r=item.json; const cfg=typeof r.config==='string'?JSON.parse(r.config):r.config; const p=typeof r.payload==='string'?JSON.parse(r.payload):r.payload; return {json:{...r,_config:cfg,notification:{priority:p.viewed?'high':'normal',subject:'[Gary Launch] Proposition à suivre — '+(p.company||p.contactName||r.operation_key),html:'<h2>Suivi de proposition</h2><p>Contact : '+(p.contactName||'—')+'</p><p>Entreprise : '+(p.company||'—')+'</p><p>Envoyée : '+(p.sentAt||'—')+'</p><p>Vue : '+(p.viewed?'Oui':'Non')+'</p><p>Le système rappelle. Gary décide du message et du moment.</p>'}}};});"
+      },
+      "id": "135d6086-3e13-49e9-8acf-4f37fad6e898",
+      "name": "Prepare Proposal Reminder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "gwbS05NotifyV1",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "9385b21f-ca82-4da0-96f5-37b9912e8c97",
+      "name": "S05 Notify Gary",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        940,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE gwb_launch.operations SET status='alerted',updated_at=now() WHERE operation_key=$1 RETURNING operation_key;",
+        "options": {
+          "queryReplacement": "={{ [$('Prepare Proposal Reminder').item.json.operation_key] }}"
+        }
+      },
+      "id": "11ed6a76-86a6-4a7c-b3b4-b83ebd0b03cd",
+      "name": "Mark Reminder Alerted",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1180,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Weekday Morning": {
+      "main": [
+        [
+          {
+            "node": "Load Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Config": {
+      "main": [
+        [
+          {
+            "node": "Find Proposal Follow-ups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Proposal Follow-ups": {
+      "main": [
+        [
+          {
+            "node": "Prepare Proposal Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Proposal Reminder": {
+      "main": [
+        [
+          {
+            "node": "S05 Notify Gary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S05 Notify Gary": {
+      "main": [
+        [
+          {
+            "node": "Mark Reminder Alerted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Internal proposal reminders; Gary retains control of relationship messages.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "e55e666a-3017-4078-acc4-596f5a3032dd"
+}

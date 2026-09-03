@@ -1,0 +1,93 @@
+{
+  "id": "gwbS03LedgerV1",
+  "name": "GWB | S03 | Append Event Ledger",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "cbee9dce-63ac-4b88-9eca-02abc5994aa4",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\nWITH inserted AS (\n  INSERT INTO gwb_launch.events\n    (event_id, correlation_id, subject_key, event_type, schema_version, source_system, occurred_at, consent, external_refs, payload, n8n_execution_id)\n  VALUES ($1, $2, NULLIF($3, '')::uuid, $4, $5, $6, $7::timestamptz, $8::jsonb, $9::jsonb, $10::jsonb, $11)\n  ON CONFLICT (event_id) DO NOTHING\n  RETURNING event_id\n)\nSELECT EXISTS (SELECT 1 FROM inserted) AS inserted, $12::jsonb AS original_event;",
+        "options": {
+          "queryReplacement": "={{ [\n  $json.eventId, $json.correlationId, $json.subjectKey || '', $json.eventType, $json.schemaVersion,\n  $json.sourceSystem || $json.source || 'unknown', $json.occurredAt || $json.submittedAt,\n  JSON.stringify($json.consent || {}), JSON.stringify($json.externalRefs || {}),\n  JSON.stringify($json.payload || $json), $execution.id, JSON.stringify($json)\n] }}"
+        }
+      },
+      "id": "0c9535d1-8f34-4431-8249-de1ef73ef512",
+      "name": "Append Idempotent Event",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_GWB_POSTGRES_CREDENTIAL_ID",
+          "name": "GWB Event Ledger Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $json;\nconst event = typeof row.original_event === 'string' ? JSON.parse(row.original_event) : row.original_event;\nreturn [{ json: { ...event, ledger: { inserted: Boolean(row.inserted), executionId: $execution.id } } }];"
+      },
+      "id": "002e69d3-d5a7-41ad-a115-2b7d9d6d2076",
+      "name": "Restore Stored Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Append Idempotent Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Idempotent Event": {
+      "main": [
+        [
+          {
+            "node": "Restore Stored Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "garyLaunchDescription": "Idempotent immutable event insert for future backend replay.",
+    "generatedBy": "Visit-card/scripts/generate-n8n-gary-launch.mjs"
+  },
+  "pinData": {},
+  "versionId": "0451d246-79c5-4019-a5c0-8f89df92d5d0"
+}

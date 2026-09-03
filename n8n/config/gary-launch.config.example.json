@@ -1,0 +1,41 @@
+{
+  "site": {
+    "baseUrl": "https://REPLACE_WITH_SITE_URL",
+    "allowedOrigins": "https://REPLACE_WITH_SITE_ORIGIN",
+    "brandName": "Gary Wilfred-Borilla",
+    "garyEmail": "REPLACE_WITH_GARY_EMAIL"
+  },
+  "hubspot": {
+    "baseUrl": "https://api.hubapi.com",
+    "scoreProperty": "gwb_intent_score",
+    "temperatureProperty": "gwb_intent_temperature",
+    "correlationProperty": "gwb_correlation_id",
+    "problemProperty": "gwb_primary_problem"
+  },
+  "brevo": {
+    "baseUrl": "https://api.brevo.com/v3",
+    "senderName": "Gary Wilfred-Borilla",
+    "senderEmail": "REPLACE_WITH_VERIFIED_SENDER_EMAIL"
+  },
+  "webinar": {
+    "provider": "REPLACE_WITH_LIVESTORM_OR_ZOOM",
+    "registrationUrl": "https://REPLACE_WITH_WEBINAR_PROVIDER_API/registrations",
+    "eventId": "REPLACE_WITH_WEBINAR_EVENT_ID",
+    "startsAt": "2026-10-15T18:00:00.000Z",
+    "joinUrl": "https://REPLACE_WITH_WEBINAR_JOIN_URL",
+    "replayUrl": "https://REPLACE_WITH_REPLAY_URL"
+  },
+  "calendar": {
+    "provider": "cal.com",
+    "bookingUrl": "https://cal.com/REPLACE_WITH_GARY/diagnostic"
+  },
+  "openai": {
+    "baseUrl": "https://api.openai.com/v1",
+    "model": "gpt-5-mini"
+  },
+  "reporting": {
+    "timezone": "America/Guadeloupe",
+    "dailyHour": 8,
+    "weeklyDay": "monday"
+  }
+}

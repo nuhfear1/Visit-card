@@ -1,0 +1,13 @@
+{
+  "dealId": "deal-demo-0001",
+  "contactId": "contact-demo-0001",
+  "correlationId": "demo-journey-0001",
+  "occurredAt": "2026-09-20T12:00:00.000Z",
+  "name": "Camille Exemple",
+  "email": "camille@example.com",
+  "company": "Entreprise Exemple",
+  "offer": "Growth System Sprint",
+  "amount": "5000",
+  "kickoffTarget": "2026-09-28",
+  "marketingConsent": false
+}
