@@ -2,9 +2,9 @@ import type { SiteCopy } from "@/lib/i18n-base";
 
 export const gcfCopy: SiteCopy = {
   nav: {
-    home: "Akèy", services: "Sèvis", projects: "Pwojé", contact: "Palé dè pwojé a-w",
+    home: "Pwoblèm-la", services: "Bon zouti-la", projects: "Sa ki ja fèt", contact: "Palé dè pwoblèm-la",
     homeDesc: "Koumansé èvè pwoblèm-la", servicesDesc: "Chwazi bon zouti-la", projectsDesc: "Vwè sa ki ja fèt", contactDesc: "Di-mwen ka ki ka frenné pwojé-la",
-    mobileEyebrow: "OLA PWOJÉ A-W YÉ KONYÉLA ?", mobileIntro: "Konprann. Chwazi. Gadé sa ki fèt. Aprésa, annou palé dè pwojé-la.", available: "An pé pran nouvo pwojé", language: "Lang",
+    mobileEyebrow: "OLA PWOJÉ A-W YÉ KONYÉLA ?", mobileIntro: "Konprann. Chwazi. Gadé sa ki fèt. Aprésa, annou palé dè pwoblèm-la.", available: "An pé pran nouvo pwojé", language: "Lang",
   },
   hero: {
     available: "AN PÉ PRAN NOUVO PWOJÉ",

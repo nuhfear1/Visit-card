@@ -106,9 +106,9 @@ export type SiteCopy = {
 
 const fr: SiteCopy = {
   nav: {
-    home: "Accueil", services: "Services", projects: "Projets", contact: "Parler du projet",
+    home: "Le problème", services: "Les leviers", projects: "Les preuves", contact: "Parler du problème",
     homeDesc: "Partir du problème", servicesDesc: "Choisir le bon levier", projectsDesc: "Voir les preuves", contactDesc: "Me dire ce qui bloque",
-    mobileEyebrow: "OÙ EN ÊTES-VOUS ?", mobileIntro: "Comprendre. Choisir. Vérifier. Puis parler du projet.", available: "Disponible pour de nouveaux projets", language: "Langue",
+    mobileEyebrow: "OÙ EN ÊTES-VOUS ?", mobileIntro: "Comprendre. Choisir. Vérifier. Puis parler du problème.", available: "Disponible pour de nouveaux projets", language: "Langue",
   },
   hero: {
     available: "DISPONIBLE POUR DE NOUVEAUX PROJETS",
@@ -146,7 +146,7 @@ const fr: SiteCopy = {
 };
 
 const en: SiteCopy = {
-  nav: { home: "Home", services: "Services", projects: "Projects", contact: "Talk about your project", homeDesc: "Start with the problem", servicesDesc: "Choose the right lever", projectsDesc: "See the proof", contactDesc: "Tell me what’s stuck", mobileEyebrow: "WHERE ARE YOU NOW?", mobileIntro: "Understand. Choose. Verify. Then talk about the project.", available: "Available for new projects", language: "Language" },
+  nav: { home: "The problem", services: "The levers", projects: "The proof", contact: "Talk about the problem", homeDesc: "Start with the problem", servicesDesc: "Choose the right lever", projectsDesc: "See the proof", contactDesc: "Tell me what’s stuck", mobileEyebrow: "WHERE ARE YOU NOW?", mobileIntro: "Understand. Choose. Verify. Then talk about the problem.", available: "Available for new projects", language: "Language" },
   hero: {
     available: "AVAILABLE FOR NEW PROJECTS",
     intro: "You don’t need to know the solution yet. Tell me what’s getting in the way and where you need to go. I’ll identify the lever that matters — strategy, AI, web, or acquisition.",
@@ -182,7 +182,7 @@ const en: SiteCopy = {
 };
 
 const es: SiteCopy = {
-  nav: { home: "Inicio", services: "Servicios", projects: "Proyectos", contact: "Hablemos del proyecto", homeDesc: "Empezar por el problema", servicesDesc: "Elegir la palanca correcta", projectsDesc: "Ver las pruebas", contactDesc: "Contarme qué está frenando", mobileEyebrow: "¿EN QUÉ PUNTO ESTÁS?", mobileIntro: "Entender. Elegir. Comprobar. Y después, hablar del proyecto.", available: "Disponible para nuevos proyectos", language: "Idioma" },
+  nav: { home: "El problema", services: "Las palancas", projects: "Las pruebas", contact: "Hablemos del problema", homeDesc: "Empezar por el problema", servicesDesc: "Elegir la palanca correcta", projectsDesc: "Ver las pruebas", contactDesc: "Contarme qué está frenando", mobileEyebrow: "¿EN QUÉ PUNTO ESTÁS?", mobileIntro: "Entender. Elegir. Comprobar. Y después, hablar del problema.", available: "Disponible para nuevos proyectos", language: "Idioma" },
   hero: {
     available: "DISPONIBLE PARA NUEVOS PROYECTOS", intro: "No necesitas llegar con la solución definida. Cuéntame qué está frenando el proyecto y adónde quieres llegar. Yo identifico la palanca que realmente hace falta: estrategia, IA, web o adquisición.", cta: "CUÉNTAME QUÉ TE FRENA ↗", lead: "PRIMERO, EL PROBLEMA.",
     phrases: ["LA ADQUISICIÓN SE ESTANCÓ", "DEMASIADO TRABAJO MANUAL", "UN SITIO QUE NO CONVIERTE", "HERRAMIENTAS DESCONECTADAS"],
@@ -215,7 +215,7 @@ const es: SiteCopy = {
 };
 
 const pt: SiteCopy = {
-  nav: { home: "Início", services: "Serviços", projects: "Projetos", contact: "Falar sobre o projeto", homeDesc: "Começar pelo problema", servicesDesc: "Escolher a alavanca certa", projectsDesc: "Ver as provas", contactDesc: "Me contar o que está travando", mobileEyebrow: "EM QUE PONTO VOCÊ ESTÁ?", mobileIntro: "Entender. Escolher. Validar. Depois, falar do projeto.", available: "Disponível para novos projetos", language: "Idioma" },
+  nav: { home: "O problema", services: "As alavancas", projects: "As provas", contact: "Falar do problema", homeDesc: "Começar pelo problema", servicesDesc: "Escolher a alavanca certa", projectsDesc: "Ver as provas", contactDesc: "Me contar o que está travando", mobileEyebrow: "EM QUE PONTO VOCÊ ESTÁ?", mobileIntro: "Entender. Escolher. Validar. Depois, falar do problema.", available: "Disponível para novos projetos", language: "Idioma" },
   hero: {
     available: "DISPONÍVEL PARA NOVOS PROJETOS",
     intro: "Você não precisa chegar com a solução pronta. Me conte o que está travando o projeto e onde quer chegar. Eu identifico a alavanca que realmente faz sentido — estratégia, IA, web ou aquisição.",
@@ -251,7 +251,7 @@ const pt: SiteCopy = {
 };
 
 const ar: SiteCopy = {
-  nav: { home: "الرئيسية", services: "الخدمات", projects: "المشاريع", contact: "لنتحدث عن مشروعك", homeDesc: "نبدأ من المشكلة", servicesDesc: "نختار الرافعة المناسبة", projectsDesc: "نرى الدليل", contactDesc: "أخبرني بما يعيق المشروع", mobileEyebrow: "أين يقف مشروعك الآن؟", mobileIntro: "نفهم. نختار. نتحقق. ثم نبدأ الحديث عن المشروع.", available: "متاح لمشاريع جديدة", language: "اللغة" },
+  nav: { home: "المشكلة", services: "الحلول المناسبة", projects: "النتائج", contact: "لنتحدث عن المشكلة", homeDesc: "نبدأ من المشكلة", servicesDesc: "نختار الرافعة المناسبة", projectsDesc: "نرى الدليل", contactDesc: "أخبرني بما يعيق المشروع", mobileEyebrow: "أين يقف مشروعك الآن؟", mobileIntro: "نفهم. نختار. نتحقق. ثم نتحدث عن المشكلة.", available: "متاح لمشاريع جديدة", language: "اللغة" },
   hero: {
     available: "متاح لمشاريع جديدة", intro: "لا تحتاج إلى تحديد الحل مسبقاً. أخبرني بما يعيق المشروع والنتيجة التي تريد الوصول إليها، وسأحدد الرافعة الأنسب — الاستراتيجية أو الذكاء الاصطناعي أو الويب أو الاستحواذ.", cta: "أخبرني بما يعيق المشروع ↗", lead: "المشكلة أولاً.",
     phrases: ["النمو لا يتقدم", "الكثير من العمل اليدوي", "موقع لا يحقق التحويل", "أدوات لا تتكامل"],
@@ -284,7 +284,7 @@ const ar: SiteCopy = {
 };
 
 const ja: SiteCopy = {
-  nav: { home: "ホーム", services: "サービス", projects: "プロジェクト", contact: "プロジェクト相談", homeDesc: "課題から考える", servicesDesc: "必要な打ち手を選ぶ", projectsDesc: "実績を見る", contactDesc: "ボトルネックを相談する", mobileEyebrow: "今、どの段階ですか？", mobileIntro: "理解する。選ぶ。確かめる。そして、プロジェクトを相談する。", available: "新規プロジェクト対応可", language: "言語" },
+  nav: { home: "課題", services: "解決の手段", projects: "実績", contact: "課題を相談", homeDesc: "課題から考える", servicesDesc: "必要な打ち手を選ぶ", projectsDesc: "実績を見る", contactDesc: "ボトルネックを相談する", mobileEyebrow: "今、どの段階ですか？", mobileIntro: "理解する。選ぶ。確かめる。そして、課題を相談する。", available: "新規プロジェクト対応可", language: "言語" },
   hero: {
     available: "新規プロジェクト対応可", intro: "解決策が決まっていなくても構いません。何がボトルネックなのか、どこを目指したいのかをお聞かせください。戦略、AI、Web、集客の中から必要な打ち手を見極めます。", cta: "課題を相談する ↗", lead: "まず、課題から。",
     phrases: ["集客が伸び悩んでいる", "手作業が多すぎる", "サイトが成果につながらない", "ツールが分断されている"],
@@ -317,7 +317,7 @@ const ja: SiteCopy = {
 };
 
 const zh: SiteCopy = {
-  nav: { home: "首页", services: "服务", projects: "项目", contact: "聊聊项目", homeDesc: "先看问题", servicesDesc: "选对解决杠杆", projectsDesc: "看实际成果", contactDesc: "说说哪里卡住了", mobileEyebrow: "你的项目现在卡在哪一步？", mobileIntro: "先理解，再选择，再验证，然后聊项目。", available: "可承接新项目", language: "语言" },
+  nav: { home: "问题", services: "解决路径", projects: "实际成果", contact: "聊聊问题", homeDesc: "先看问题", servicesDesc: "选对解决杠杆", projectsDesc: "看实际成果", contactDesc: "说说哪里卡住了", mobileEyebrow: "你的项目现在卡在哪一步？", mobileIntro: "先理解，再选择，再验证，然后聊聊问题。", available: "可承接新项目", language: "语言" },
   hero: {
     available: "可承接新项目", intro: "你不需要先想好解决方案。告诉我哪里卡住、目标是什么，我会判断真正该动用的杠杆——策略、AI、网站还是获客。", cta: "说说哪里卡住了 ↗", lead: "先看问题，再谈方案。",
     phrases: ["获客增长停滞", "手工作业过多", "网站有流量却不转化", "工具彼此割裂"],
@@ -350,7 +350,7 @@ const zh: SiteCopy = {
 };
 
 const ko: SiteCopy = {
-  nav: { home: "홈", services: "서비스", projects: "프로젝트", contact: "프로젝트 상담", homeDesc: "문제부터 보기", servicesDesc: "맞는 해법 선택", projectsDesc: "실제 사례 확인", contactDesc: "막힌 지점 이야기하기", mobileEyebrow: "지금 프로젝트는 어디에 있나요?", mobileIntro: "이해하고, 선택하고, 확인한 뒤 프로젝트를 이야기합니다.", available: "신규 프로젝트 진행 가능", language: "언어" },
+  nav: { home: "문제", services: "해결 수단", projects: "성과", contact: "문제 상담", homeDesc: "문제부터 보기", servicesDesc: "맞는 해법 선택", projectsDesc: "실제 사례 확인", contactDesc: "막힌 지점 이야기하기", mobileEyebrow: "지금 프로젝트는 어디에 있나요?", mobileIntro: "이해하고, 선택하고, 확인한 뒤 문제를 이야기합니다.", available: "신규 프로젝트 진행 가능", language: "언어" },
   hero: {
     available: "신규 프로젝트 진행 가능", intro: "해결책을 미리 정해 오실 필요는 없습니다. 무엇이 막혀 있는지, 어디까지 가고 싶은지 알려주세요. 전략, AI, 웹, 고객 획득 중 어디에 개입해야 하는지 판단하겠습니다.", cta: "막힌 지점 상담하기 ↗", lead: "문제부터 봅니다.",
     phrases: ["유입 성장이 정체됨", "반복되는 수작업", "전환되지 않는 웹사이트", "서로 연결되지 않은 도구"],
