@@ -14,13 +14,13 @@ visitor -> registration -> attendance -> intent -> conversation -> opportunity -
 
 The repository now contains the complete generated pack:
 
-- `n8n/gary-launch.n8np` for the connected, transactional import through the n8n API CLI;
-- `n8n/workflows/*.json` as source files only, never as the normal installation path;
-- `n8n/import-order.json` for dependency order and endpoints;
+- `n8n/gary-launch.connected.json` as one standard workflow object for **Import from File** in the editor;
+- `n8n/workflows/*.json` as modular generator sources only, never as the installation path;
+- `n8n/module-map.json` for the generator dependency map and endpoints;
 - `n8n/fixtures/*.json` for safe acceptance tests;
 - `n8n/README.md` for credentials, provider mapping and activation.
 
-The 22 workflows contain 185 connected nodes and import inactive. Provider credentials and signed-callback verification remain environment-specific and are bound in n8n, never committed to Git.
+The generated canvas contains 205 connected nodes, 13 trigger entries and 9 webhooks, and imports inactive. The 22 domain modules remain visible in node prefixes while their former sub-workflow calls are inlined. Provider credentials and signed-callback verification remain environment-specific and are bound in n8n, never committed to Git.
 
 ## Architecture by phase
 

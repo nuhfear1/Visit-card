@@ -1,23 +1,23 @@
-# Gary launch automation pack
+# Gary launch connected workflow
 
 This directory contains the importable n8n implementation of the Gary Wilfred-Borilla launch system. It keeps the visitor experience human while structuring acquisition, webinar, sales and delivery operations behind the scenes.
 
 ## Deliverables
 
-- `gary-launch.n8np`: the connected 22-workflow package and the only supported installation artifact.
-- `workflows/*.json`: versioned sources for generation and review; don't import them separately.
-- `import-order.json`: dependency inventory, stable IDs, webhook inventory and credential names.
+- `gary-launch.connected.json`: the only file to import into n8n. It is one standard workflow object containing the complete connected system.
+- `workflows/*.json`: modular source files used by the generator; don't import them separately.
+- `module-map.json`: generator dependency inventory, stable IDs, webhook inventory and credential names.
 - `config/gary-launch.config.example.json`: non-secret integration and campaign configuration.
 - `credentials.example.json`: credential inventory without values.
 - `fixtures/*.json`: safe requests for validation and duplicate testing.
 
 All workflows import inactive. No API key, password, webhook secret or database connection is committed.
 
-## Workflow inventory
+## Connected domain inventory
 
 | Group | IDs | Purpose |
 |---|---|---|
-| Foundation | W99, S01–S06, W00 | SQL ledger, validation, identity, idempotency, consent, alerts and failures |
+| Foundation | W99, S01–S06, W00 | SQL ledger, validation, identity, idempotency, consent and shared error outputs |
 | Acquisition | W01–W06 | Project conversation, registration, reminders, attendance, score and segmented follow-up |
 | Sales | W07–W10 | Optional diagnostic/booking, factual pre-call brief, pipeline and proposal reminders |
 | Compounding loop | W11–W14 | Content drafts, onboarding, proof/referral and revenue-chain reporting |
@@ -63,30 +63,19 @@ Before activation:
 - ensure the Postgres role can create the `gwb_launch` schema;
 - configure every server-to-server callback to send the internal header, or replace that boundary with the selected provider's signed-webhook verification.
 
-## 3. Import the connected system
+## 3. Import directly from the editor
 
-Do not import the files under `workflows/` one by one. That can recreate workflow IDs and break `Execute Workflow` relationships. The former array bundle and the individual-workflow ZIP have both been removed.
+Do not import the files under `workflows/`, the old array bundle, a ZIP, or an `.n8np` package.
 
-`gary-launch.n8np` uses n8n's package format version 1. It contains all 22 workflows, all static sub-workflow requirements and their 47 `Execute Workflow` nodes. Import it as one transaction through n8n's public API CLI:
+1. Open a blank workflow in n8n.
+2. Select the three-dot menu in the editor.
+3. Select **Import from File**.
+4. Choose `n8n/gary-launch.connected.json`.
+5. Keep the imported workflow inactive while binding credentials and checking configuration.
 
-```bash
-export N8N_URL="https://YOUR-N8N-INSTANCE"
-export N8N_API_KEY="YOUR-N8N-API-KEY"
-npm run n8n:import
-```
+The imported canvas contains 205 nodes, 13 independent trigger entries and 9 webhooks. The former 47 sub-workflow calls are expanded directly into the appropriate branches, so there is no cross-workflow ID to remap or reconnect.
 
-The import runs with `workflow-conflict-policy=fail`, so it won't overwrite an existing workflow, and `credential-missing-mode=create-stub`, so n8n creates the six empty credential placeholders while preserving every node binding. Fill those credential stubs after import.
-
-The editor's **Import from File** action imports one JSON workflow only and isn't the entry point for this multi-workflow system. If the installed n8n version has no `package import` command, stop and upgrade or provide the exact n8n version before attempting an alternative import.
-
-Run `GWB | W99 | One-time Ledger Setup` manually once. Do not activate it.
-
-Set `GWB | W00 | Error Operations` as the error workflow for W01–W14 in workflow settings. Then publish in this order:
-
-1. S01–S06 and W00.
-2. W01–W06.
-3. W07–W10.
-4. W11–W14.
+The W99 setup branch begins at `W99 · Manual Trigger`. Execute that branch once to create the Postgres schema before activating the workflow. Integration and Postgres nodes route their error output to the inlined W00 incident handler.
 
 ## 4. Map provider adapters
 
@@ -126,7 +115,7 @@ Required acceptance tests:
 7. W11 stores drafts but publishes nothing.
 8. W14 reconciles registration, attendance, booking, opportunity, sale and revenue.
 
-The structural validators check JSON parsing, code-node syntax, graph reachability, all 47 cross-workflow calls, stable sub-workflow references, webhook uniqueness, inactive imports, accidental secret patterns, the `.n8np` archive order and its package manifest. They do not replace an end-to-end run against the chosen n8n version and real provider sandboxes.
+The structural validators check that the root is one workflow object rather than an array, every node and edge is reachable from a trigger, all former sub-workflow calls are inlined, all node references resolve, webhook paths are unique, imports are inactive and code-node JavaScript parses. They do not replace an end-to-end run against the chosen n8n version and real provider sandboxes.
 
 ## 6. Connect Visit-card
 

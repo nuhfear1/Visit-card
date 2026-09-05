@@ -8,7 +8,7 @@ const check = (condition, message) => {
   if (!condition) failures.push(message);
 };
 
-const manifest = JSON.parse(await readFile(resolve(root, "n8n/import-order.json"), "utf8"));
+const manifest = JSON.parse(await readFile(resolve(root, "n8n/module-map.json"), "utf8"));
 const workflowFiles = (await readdir(workflowDir)).filter((file) => file.endsWith(".json")).sort();
 const workflows = await Promise.all(workflowFiles.map(async (file) => ({
   file,
@@ -17,8 +17,8 @@ const workflows = await Promise.all(workflowFiles.map(async (file) => ({
 
 check(workflows.length === 22, `Expected 22 workflow files, found ${workflows.length}`);
 check(manifest.workflowCount === workflows.length, "Manifest workflow count does not match files");
-check(manifest.format === "individual-n8n-workflow-json", "Import order has an unexpected format");
-check(manifest.uiImportable === true, "Individual workflow import must be marked UI-compatible");
+check(manifest.format === "modular-generator-source", "Module map has an unexpected format");
+check(manifest.uiImportable === false, "Modular sources must not be marked UI-compatible");
 
 try {
   await access(resolve(root, "n8n/gary-launch.bundle.json"));
@@ -110,7 +110,7 @@ for (const { file, workflow } of workflows) {
 }
 
 for (const { workflow } of workflows) {
-  check(manifest.importOrder.some((entry) => entry.id === workflow.id), `Manifest is missing ${workflow.id}`);
+  check(manifest.importOrder.some((entry) => entry.id === workflow.id), `Module map is missing ${workflow.id}`);
 }
 
 const serialized = JSON.stringify({ workflows: workflows.map(({ workflow }) => workflow), manifest });
