@@ -4,10 +4,9 @@ This directory contains the importable n8n implementation of the Gary Wilfred-Bo
 
 ## Deliverables
 
-- `gary-launch.n8np`: official multi-workflow package for the current n8n API CLI (Preview).
-- `gary-launch-individual-workflows.zip`: the 22 standalone JSON files, ready to extract.
-- `workflows/*.json`: one valid workflow object per file for editor UI import and review.
-- `import-order.json`: exact individual import order, stable IDs, webhook inventory and credential names.
+- `gary-launch.n8np`: the connected 22-workflow package and the only supported installation artifact.
+- `workflows/*.json`: versioned sources for generation and review; don't import them separately.
+- `import-order.json`: dependency inventory, stable IDs, webhook inventory and credential names.
 - `config/gary-launch.config.example.json`: non-secret integration and campaign configuration.
 - `credentials.example.json`: credential inventory without values.
 - `fixtures/*.json`: safe requests for validation and duplicate testing.
@@ -64,27 +63,21 @@ Before activation:
 - ensure the Postgres role can create the `gwb_launch` schema;
 - configure every server-to-server callback to send the internal header, or replace that boundary with the selected provider's signed-webhook verification.
 
-## 3. Import without the old array bundle
+## 3. Import the connected system
 
-The former `gary-launch.bundle.json` was a JSON array. The n8n editor's **Import from File** action expects one workflow object and rejects that shape. It has been removed so it cannot be confused with an importable workflow again.
+Do not import the files under `workflows/` one by one. That can recreate workflow IDs and break `Execute Workflow` relationships. The former array bundle and the individual-workflow ZIP have both been removed.
 
-### Most compatible: editor UI
-
-Extract `gary-launch-individual-workflows.zip`, then use **Import from File** on each JSON in the numbered order. The same order is recorded in `import-order.json`.
-
-Every file under `workflows/` has a JSON object at its root, never an array. If the target n8n instance replaces any stable workflow ID, reselect the referenced sub-workflow in each `Execute Workflow` node.
-
-### Grouped import: current n8n package API
-
-`gary-launch.n8np` uses n8n's official package format version 1. Packages are a Preview feature imported through the public API CLI, not through the workflow editor's JSON import button:
+`gary-launch.n8np` uses n8n's package format version 1. It contains all 22 workflows, all static sub-workflow requirements and their 47 `Execute Workflow` nodes. Import it as one transaction through n8n's public API CLI:
 
 ```bash
-npx @n8n/cli package import \
-  --file=n8n/gary-launch.n8np \
-  --workflow-conflict-policy=fail
+export N8N_URL="https://YOUR-N8N-INSTANCE"
+export N8N_API_KEY="YOUR-N8N-API-KEY"
+npm run n8n:import
 ```
 
-This command requires the CLI to be connected to the target n8n instance with an API key. Because the workflows reference six credentials whose secrets are deliberately absent, map the credential requirements to credentials created on the target instance during package import. If the installed n8n version has no `package import` command, use the individual JSON route above.
+The import runs with `workflow-conflict-policy=fail`, so it won't overwrite an existing workflow, and `credential-missing-mode=create-stub`, so n8n creates the six empty credential placeholders while preserving every node binding. Fill those credential stubs after import.
+
+The editor's **Import from File** action imports one JSON workflow only and isn't the entry point for this multi-workflow system. If the installed n8n version has no `package import` command, stop and upgrade or provide the exact n8n version before attempting an alternative import.
 
 Run `GWB | W99 | One-time Ledger Setup` manually once. Do not activate it.
 
@@ -133,7 +126,7 @@ Required acceptance tests:
 7. W11 stores drafts but publishes nothing.
 8. W14 reconciles registration, attendance, booking, opportunity, sale and revenue.
 
-The structural validators check JSON parsing, code-node syntax, graph reachability, stable sub-workflow references, webhook uniqueness, inactive imports, accidental secret patterns, the `.n8np` archive order and its package manifest. They do not replace an end-to-end run against the chosen n8n version and real provider sandboxes.
+The structural validators check JSON parsing, code-node syntax, graph reachability, all 47 cross-workflow calls, stable sub-workflow references, webhook uniqueness, inactive imports, accidental secret patterns, the `.n8np` archive order and its package manifest. They do not replace an end-to-end run against the chosen n8n version and real provider sandboxes.
 
 ## 6. Connect Visit-card
 

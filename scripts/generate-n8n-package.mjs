@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdir, readFile, readdir, rm, utimes, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { promisify } from "node:util";
 
@@ -10,7 +10,6 @@ const n8nDir = resolve(root, "n8n");
 const workflowDir = resolve(n8nDir, "workflows");
 const buildDir = resolve(n8nDir, ".package-build");
 const packagePath = resolve(n8nDir, "gary-launch.n8np");
-const zipPath = resolve(n8nDir, "gary-launch-individual-workflows.zip");
 
 const files = (await readdir(workflowDir)).filter((file) => file.endsWith(".json")).sort();
 const workflows = await Promise.all(files.map(async (file) => ({
@@ -118,16 +117,6 @@ await execFileAsync("tar", [
   "workflows",
 ], { cwd: buildDir });
 
-const zipBuildDir = resolve(buildDir, "individual-workflows");
-await mkdir(zipBuildDir, { recursive: true });
-for (const { file, workflow } of workflows) {
-  const stagedPath = resolve(zipBuildDir, file);
-  await writeFile(stagedPath, `${JSON.stringify(workflow, null, 2)}\n`);
-  await utimes(stagedPath, new Date(exportedAt), new Date(exportedAt));
-}
-await rm(zipPath, { force: true });
-await execFileAsync("zip", ["-X", "-q", zipPath, ...files], { cwd: zipBuildDir });
 await rm(buildDir, { recursive: true, force: true });
 
 console.log(`Generated n8n package ${packagePath}`);
-console.log(`Generated individual workflow archive ${zipPath}`);
