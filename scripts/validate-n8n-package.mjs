@@ -28,17 +28,36 @@ try {
   check(Array.isArray(manifest.workflows) && manifest.workflows.length === 22, "package must contain 22 workflows");
 
   const workflowIds = new Set();
+  const actualReferences = new Map();
+  let executeWorkflowNodeCount = 0;
   for (const entry of manifest.workflows || []) {
     const packaged = JSON.parse(await readFile(resolve(tempDir, entry.target, "workflow.json"), "utf8"));
     check(packaged.id === entry.id, `${entry.target}: workflow ID differs from manifest`);
     check(packaged.name === entry.name, `${entry.target}: workflow name differs from manifest`);
     check(!workflowIds.has(entry.id), `duplicate packaged workflow ID ${entry.id}`);
     workflowIds.add(entry.id);
+    for (const node of packaged.nodes || []) {
+      if (node.type !== "n8n-nodes-base.executeWorkflow") continue;
+      executeWorkflowNodeCount += 1;
+      const targetId = node.parameters?.workflowId?.value;
+      const callers = actualReferences.get(targetId) || new Set();
+      callers.add(packaged.id);
+      actualReferences.set(targetId, callers);
+    }
   }
 
+  const declaredReferences = new Map();
   for (const requirement of manifest.requirements?.workflows || []) {
     check(workflowIds.has(requirement.id), `unknown required workflow ${requirement.id}`);
     check(requirement.usedByWorkflows.every((id) => workflowIds.has(id)), `invalid workflow usage for ${requirement.id}`);
+    declaredReferences.set(requirement.id, new Set(requirement.usedByWorkflows));
+  }
+  check(executeWorkflowNodeCount === 47, `expected 47 Execute Workflow nodes, found ${executeWorkflowNodeCount}`);
+  for (const [targetId, callers] of actualReferences) {
+    check(workflowIds.has(targetId), `Execute Workflow points outside the package: ${targetId}`);
+    check(declaredReferences.has(targetId), `manifest does not declare workflow dependency ${targetId}`);
+    const declaredCallers = declaredReferences.get(targetId) || new Set();
+    check([...callers].every((id) => declaredCallers.has(id)), `manifest callers differ for ${targetId}`);
   }
   for (const requirement of manifest.requirements?.credentials || []) {
     check(requirement.id && requirement.name && requirement.type, "invalid credential requirement");
@@ -58,4 +77,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Validated official .n8np layout, manifest and 22 packaged workflows.");
+console.log("Validated official .n8np layout, 22 packaged workflows and 47 cross-workflow calls.");
