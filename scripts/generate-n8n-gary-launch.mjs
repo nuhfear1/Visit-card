@@ -26,7 +26,7 @@ const root = resolve(import.meta.dirname, "..");
 const configPath = resolve(root, "n8n/config/gary-launch.config.json");
 const exampleConfigPath = resolve(root, "n8n/config/gary-launch.config.example.json");
 const outputDir = resolve(root, "n8n/workflows");
-const importOrderPath = resolve(root, "n8n/import-order.json");
+const moduleMapPath = resolve(root, "n8n/module-map.json");
 
 const readConfig = async () => {
   try {
@@ -37,7 +37,7 @@ const readConfig = async () => {
 };
 
 const config = await readConfig();
-const generatedAt = await readFile(importOrderPath, "utf8")
+const generatedAt = await readFile(moduleMapPath, "utf8")
   .then((content) => JSON.parse(content).generatedAt)
   .catch(() => new Date().toISOString());
 const configLiteral = JSON.stringify(config);
@@ -511,11 +511,11 @@ const fileNames = {
 
 await mkdir(outputDir, { recursive: true });
 await Promise.all(workflows.map((item) => writeFile(resolve(outputDir, fileNames[item.id]), `${JSON.stringify(item, null, 2)}\n`)));
-await writeFile(importOrderPath, `${JSON.stringify({
+await writeFile(moduleMapPath, `${JSON.stringify({
   name: "Gary Wilfred-Borilla launch system",
   schemaVersion: "1.0",
-  format: "individual-n8n-workflow-json",
-  uiImportable: true,
+  format: "modular-generator-source",
+  uiImportable: false,
   generatedAt,
   workflowCount: workflows.length,
   importOrder: workflows.map((item) => ({ id: item.id, name: item.name, file: `workflows/${fileNames[item.id]}` })),
